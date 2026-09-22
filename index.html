@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ACADEMIA — TREINO DOS AMIGOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ==================== TELA DE LOGIN/CADASTRO ==================== -->
+  <div id="tela-auth" class="tela-auth">
+    <div class="card">
+      <h1 class="logo">ACADEMIA</h1>
+      <p class="subtitulo">TREINO DOS AMIGOS</p>
+
+      <div class="abas">
+        <button id="aba-login" class="aba ativa">ENTRAR</button>
+        <button id="aba-cadastro" class="aba">CADASTRAR</button>
+      </div>
+
+      <form id="form">
+        <input type="text" id="nome" placeholder="SEU NOME" >
+        <input type="email" id="email" placeholder="SEU EMAIL" required>
+        <input type="password" id="senha" placeholder="SUA SENHA" required minlength="6">
+        <button type="submit" id="btn-acao">ENTRAR</button>
+      </form>
+
+      <p id="msg" class="msg"></p>
+    </div>
+  </div>
+
+  <!-- ==================== TELA DO APP (LOGADO) ==================== -->
+  <div id="tela-app" class="tela-app escondido">
+
+    <!-- HEADER FULL WIDTH -->
+    <header class="app-header">
+      <div class="header-conteudo">
+        <div class="header-esquerda">
+          <button id="btn-seta" class="btn-seta escondido" title="Desfazer">↩</button>
+          <img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
+        </div>
+
+        <nav class="header-menu">
+          <button id="menu-treino" class="menu-item ativo">TREINO</button>
+          <button id="menu-semana" class="menu-item">SEMANA COMPLETA</button>
+        </nav>
+
+        <button id="btn-sair" class="btn-sair-topo">SAIR</button>
+        <button id="btn-hamburguer" class="btn-hamburguer">☰</button>
+      </div>
+
+      <!-- MENU MOBILE -->
+      <nav id="menu-mobile" class="menu-mobile escondido">
+        <button id="menu-treino-mob" class="menu-item-mob">TREINO</button>
+        <button id="menu-semana-mob" class="menu-item-mob">SEMANA COMPLETA</button>
+        <button id="btn-sair-mob" class="menu-item-mob sair">SAIR</button>
+      </nav>
+    </header>
+
+    <!-- CONTEÚDO -->
+    <main class="conteudo">
+
+      <!-- ABA: TREINO -->
+      <section id="aba-treino" class="aba-conteudo">
+        <h1 class="saudacao">OLÁ, <span id="nome-user"></span>!</h1>
+        <p class="dia-hoje">HOJE É <strong id="dia-semana"></strong></p>
+
+        <p id="resumo-ontem" class="resumo-ontem"></p>
+
+        <div id="pergunta-ontem" class="pergunta-ontem escondido">
+          <p>VOCÊ TREINOU ONTEM?</p>
+          <div class="botoes-ontem">
+            <button id="btn-treinei" class="btn-sim">✔ SIM, TREINEI</button>
+            <button id="btn-faltei" class="btn-nao">✘ NÃO, FALTEI</button>
+          </div>
+        </div>
+
+        <div class="treino-box">
+          <span class="treino-label">TREINO DE HOJE</span>
+          <p id="treino-hoje" class="treino-texto"></p>
+        </div>
+      </section>
+
+      <!-- ABA: SEMANA -->
+      <section id="aba-semana" class="aba-conteudo escondido">
+        <h2 class="titulo-secao">SEMANA COMPLETA</h2>
+        <ul id="lista-semana" class="lista-semana"></ul>
+      </section>
+
+    </main>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
