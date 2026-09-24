@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ACADEMIA — TREINO DOS AMIGOS</title>
+  <title>ACADEMIA — FUDIDA</title>
+  <link rel="icon" type="image/png" href="logosite.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -15,7 +16,7 @@
   <div id="tela-auth" class="tela-auth">
     <div class="card">
       <h1 class="logo">ACADEMIA</h1>
-      <p class="subtitulo">TREINO DOS AMIGOS</p>
+      <p class="subtitulo">FUDIDA</p>
 
       <div class="abas">
         <button id="aba-login" class="aba ativa">ENTRAR</button>
@@ -45,7 +46,14 @@
 
         <nav class="header-menu">
           <button id="menu-treino" class="menu-item ativo">TREINO</button>
-          <button id="menu-peso" class="menu-item">MEU PESO</button>
+          <div class="menu-dropdown-wrapper">
+            <button id="menu-peso" class="menu-item">MEU PESO ▾</button>
+            <div id="dropdown-peso" class="dropdown-peso">
+              <button id="btn-add-peso" class="dropdown-item">ADICIONAR PESO</button>
+              <button id="btn-historico" class="dropdown-item">HISTÓRICO</button>
+              <button id="btn-grafico" class="dropdown-item">GRÁFICO</button>
+            </div>
+          </div>
           <button id="menu-exercicios" class="menu-item">EXERCÍCIOS</button>
           <button id="menu-semana" class="menu-item">SEMANA COMPLETA</button>
         </nav>
@@ -56,7 +64,12 @@
 
       <nav id="menu-mobile" class="menu-mobile escondido">
         <button id="menu-treino-mob" class="menu-item-mob">TREINO</button>
-        <button id="menu-peso-mob" class="menu-item-mob">MEU PESO</button>
+        <button id="menu-peso-mob" class="menu-item-mob">MEU PESO ▾</button>
+        <div id="submenu-peso-mob" class="submenu-mob">
+          <button id="btn-add-peso-mob" class="submenu-item">ADICIONAR PESO</button>
+          <button id="btn-historico-mob" class="submenu-item">HISTÓRICO</button>
+          <button id="btn-grafico-mob" class="submenu-item">GRÁFICO</button>
+        </div>
         <button id="menu-exercicios-mob" class="menu-item-mob">EXERCÍCIOS</button>
         <button id="menu-semana-mob" class="menu-item-mob">SEMANA COMPLETA</button>
         <button id="btn-sair-mob" class="menu-item-mob sair">SAIR</button>
@@ -86,6 +99,40 @@
         </div>
       </section>
 
+      <!-- ABA: ADICIONAR PESO -->
+      <section id="aba-add-peso" class="aba-conteudo escondido">
+        <h2 class="titulo-secao">ADICIONAR PESO</h2>
+        <div class="peso-input-box">
+          <input type="number" id="input-peso" placeholder="EX: 78.5" step="0.1" min="0" max="500">
+          <button id="btn-salvar-peso">SALVAR</button>
+        </div>
+        <p id="msg-peso" class="msg"></p>
+      </section>
+
+      <!-- ABA: HISTÓRICO -->
+      <section id="aba-historico" class="aba-conteudo escondido">
+        <h2 class="titulo-secao">HISTÓRICO DE PESO</h2>
+        <ul id="lista-historico" class="lista-semana"></ul>
+        <p id="sem-historico" class="sem-dados escondido">NENHUM REGISTRO AINDA.</p>
+      </section>
+
+      <!-- ABA: GRÁFICO -->
+      <section id="aba-grafico" class="aba-conteudo escondido">
+        <h2 class="titulo-secao">GRÁFICO DE PESO</h2>
+
+        <div class="filtros-grafico">
+          <button id="filtro-30dias" class="filtro-btn ativo">ÚLTIMOS 30 DIAS</button>
+          <select id="select-mes" class="select-mes">
+            <option value="">SELECIONE O MÊS</option>
+          </select>
+        </div>
+
+        <div class="grafico-box">
+          <canvas id="grafico-peso"></canvas>
+          <p id="sem-grafico" class="sem-dados escondido">NENHUM REGISTRO AINDA. ADICIONE UM PESO PRIMEIRO.</p>
+        </div>
+      </section>
+
       <!-- ABA: EXERCÍCIOS -->
       <section id="aba-exercicios" class="aba-conteudo escondido">
         <h2 class="titulo-secao">EXERCÍCIOS</h2>
@@ -104,13 +151,6 @@
         </p>
       </section>
 
-      <!-- ABA: HISTÓRICO -->
-      <section id="aba-historico" class="aba-conteudo escondido">
-        <h2 class="titulo-secao">HISTÓRICO DE PESO</h2>
-        <ul id="lista-historico" class="lista-semana"></ul>
-        <p id="sem-historico" class="sem-dados escondido">NENHUM REGISTRO AINDA.</p>
-      </section>
-
       <!-- ABA: SEMANA -->
       <section id="aba-semana" class="aba-conteudo escondido">
         <h2 class="titulo-secao">SEMANA COMPLETA</h2>
@@ -120,20 +160,8 @@
     </main>
   </div>
 
-  <!-- MODAL: MEU PESO -->
-  <div id="modal-peso" class="modal-overlay escondido">
-    <div class="modal-card" id="modal-peso-card">
-      <button id="btn-fechar-modal" class="modal-x" title="Ver histórico">✕</button>
-      <h2 class="modal-titulo">COLOQUE SEU PESO</h2>
-      <div class="peso-input-box">
-        <input type="number" id="input-peso" placeholder="EX: 78.5" step="0.1" min="0" max="500">
-        <button id="btn-salvar-peso">SALVAR</button>
-      </div>
-      <p id="msg-peso" class="msg"></p>
-    </div>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

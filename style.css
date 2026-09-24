@@ -163,6 +163,7 @@ input:focus { outline: none; border-color: #e30613; }
   display: flex;
   align-items: center;
   gap: 20px;
+  position: relative;
 }
 
 .header-esquerda {
@@ -201,14 +202,12 @@ input:focus { outline: none; border-color: #e30613; }
   transform: scale(1.08);
 }
 
-.btn-seta:active { transform: scale(0.92); }
-
 .header-menu {
   display: flex;
   gap: 6px;
   flex: 1;
   justify-content: center;
-  flex-wrap: wrap;
+  align-items: center;
 }
 
 .menu-item {
@@ -234,6 +233,58 @@ input:focus { outline: none; border-color: #e30613; }
 .menu-item.ativo {
   color: #fff;
   background: #e30613;
+}
+
+/* Dropdown MEU PESO (desktop) */
+.menu-dropdown-wrapper {
+  position: relative;
+}
+
+.dropdown-peso {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-top: 2px solid #e30613;
+  border-radius: 6px;
+  min-width: 180px;
+  padding: 6px;
+  margin-top: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+  z-index: 200;
+}
+
+.dropdown-peso.aberto {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  color: #ccc;
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #e30613;
+  color: #fff;
 }
 
 .btn-sair-topo {
@@ -275,6 +326,7 @@ input:focus { outline: none; border-color: #e30613; }
   color: #e30613;
 }
 
+/* Menu mobile */
 .menu-mobile {
   display: none;
   flex-direction: column;
@@ -299,7 +351,42 @@ input:focus { outline: none; border-color: #e30613; }
 }
 
 .menu-item-mob:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.menu-item-mob.ativo { background: #e30613; color: #fff; }
 .menu-item-mob.sair { color: #e30613; border-top: 1px solid #2a2a2a; margin-top: 4px; padding-top: 16px; border-radius: 0; }
+
+/* Submenu MEU PESO no mobile */
+.submenu-mob {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  margin-left: 16px;
+}
+
+.submenu-mob.aberto {
+  max-height: 300px;
+}
+
+.submenu-item {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid #333;
+  color: #888;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submenu-item:hover {
+  color: #e30613;
+  border-left-color: #e30613;
+}
 
 /* ==================== CONTEÚDO ==================== */
 .conteudo {
@@ -428,7 +515,7 @@ input:focus { outline: none; border-color: #e30613; }
   line-height: 1.1;
 }
 
-/* ==================== ABAS SEMANA / HISTÓRICO ==================== */
+/* ==================== TÍTULOS ==================== */
 .titulo-secao {
   font-family: 'Anton', sans-serif;
   font-size: 24px;
@@ -449,6 +536,7 @@ input:focus { outline: none; border-color: #e30613; }
   font-family: 'Inter', sans-serif;
 }
 
+/* ==================== LISTAS ==================== */
 .lista-semana {
   list-style: none;
   margin: 0;
@@ -516,177 +604,11 @@ input:focus { outline: none; border-color: #e30613; }
   text-transform: uppercase;
 }
 
-/* ==================== ABA EXERCÍCIOS ==================== */
-.filtros-musculo {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 24px;
-}
-
-.filtro-btn {
-  padding: 10px 16px;
-  background: transparent;
-  border: 2px solid #333;
-  color: #888;
-  border-radius: 999px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 900;
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.filtro-btn:hover {
-  color: #fff;
-  border-color: #fff;
-}
-
-.filtro-btn.ativo {
-  background: #e30613;
-  border-color: #e30613;
-  color: #fff;
-}
-
-.exercicios-loading {
-  text-align: center;
-  padding: 40px 20px;
-  color: #888;
-  font-family: 'Anton', sans-serif;
-  font-size: 14px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-.lista-exercicios {
-  list-style: none;
-  margin: 0;
-}
-
-.card-exercicio {
-  background: #1a1a1a;
-  border-radius: 8px;
-  margin-bottom: 12px;
-  overflow: hidden;
-  border-left: 4px solid #e30613;
-  animation: fadein 0.3s ease;
-}
-
-.card-exercicio .gif-wrapper {
-  width: 100%;
-  background: #f0f0f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px;
-}
-
-.card-exercicio .gif-wrapper img {
-  max-width: 100%;
-  max-height: 280px;
-  display: block;
-  object-fit: contain;
-}
-
-.card-exercicio .info-exercicio {
-  padding: 16px 18px;
-}
-
-.card-exercicio .nome-exercicio {
-  font-family: 'Anton', sans-serif;
-  font-size: 18px;
-  letter-spacing: 1px;
-  color: #fff;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-  line-height: 1.15;
-}
-
-.card-exercicio .equip-exercicio {
-  font-size: 11px;
-  letter-spacing: 2px;
-  color: #888;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
-/* ==================== MODAL (MEU PESO) ==================== */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(4px);
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  animation: overlayIn 0.25s ease;
-}
-
-@keyframes overlayIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.modal-card {
-  position: relative;
-  width: 100%;
-  max-width: 440px;
-  background: #111;
-  border: 1px solid #222;
-  border-radius: 8px;
-  padding: 36px 28px 28px;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.9);
-  animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes modalIn {
-  from { opacity: 0; transform: scale(0.94) translateY(8px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.modal-x {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 2px solid #333;
-  background: transparent;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 900;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.modal-x:hover {
-  border-color: #e30613;
-  color: #e30613;
-  transform: rotate(90deg);
-}
-
-.modal-titulo {
-  font-family: 'Anton', sans-serif;
-  font-size: 20px;
-  letter-spacing: 2px;
-  color: #fff;
-  text-transform: uppercase;
-  text-align: center;
-  margin-bottom: 24px;
-}
-
+/* ==================== PESO INPUT ==================== */
 .peso-input-box {
   display: flex;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .peso-input-box input {
@@ -721,6 +643,143 @@ input:focus { outline: none; border-color: #e30613; }
   transform: none;
 }
 
+/* ==================== GRÁFICO ==================== */
+.filtros-grafico {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filtro-btn {
+  padding: 10px 16px;
+  background: transparent;
+  border: 2px solid #333;
+  color: #888;
+  border-radius: 999px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filtro-btn:hover {
+  color: #fff;
+  border-color: #fff;
+}
+
+.filtro-btn.ativo {
+  background: #e30613;
+  border-color: #e30613;
+  color: #fff;
+}
+
+.select-mes {
+  padding: 10px 16px;
+  background: #1a1a1a;
+  border: 2px solid #333;
+  color: #888;
+  border-radius: 999px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  outline: none;
+}
+
+.select-mes:focus {
+  border-color: #e30613;
+  color: #fff;
+}
+
+.select-mes option {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.grafico-box {
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 20px;
+  height: 500px;
+  position: relative;
+}
+
+.grafico-box canvas {
+  max-height: 100%;
+}
+
+/* ==================== ABA EXERCÍCIOS ==================== */
+.filtros-musculo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.card-exercicio {
+  background: #1a1a1a;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  border-left: 4px solid #e30613;
+  animation: fadein 0.3s ease;
+}
+
+.card-exercicio .gif-wrapper {
+  width: 100%;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  height: 200px;
+}
+
+.card-exercicio .gif-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.card-exercicio .info-exercicio {
+  padding: 14px 18px 18px;
+}
+
+.card-exercicio .nome-exercicio {
+  font-family: 'Anton', sans-serif;
+  font-size: 17px;
+  letter-spacing: 1px;
+  color: #fff;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  line-height: 1.15;
+}
+
+.card-exercicio .equip-exercicio {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #888;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.exercicios-loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: #888;
+  font-family: 'Anton', sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
 /* ==================== RESPONSIVO ==================== */
 @media (max-width: 720px) {
   .header-menu { display: none; }
@@ -743,9 +802,12 @@ input:focus { outline: none; border-color: #e30613; }
   .card { padding: 32px 20px; }
   .logo { font-size: 34px; }
 
-  .modal-card { padding: 32px 20px 24px; }
   .peso-input-box { flex-direction: column; }
   .peso-input-box button { width: 100%; }
 
-  .card-exercicio .gif-wrapper img { max-height: 220px; }
+  .card-exercicio .gif-wrapper { height: 170px; }
+
+  .grafico-box { height: 400px; padding: 12px; }
+
+  .filtros-grafico { flex-direction: column; }
 }
