@@ -1,3 +1,8 @@
+:root {
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -10,6 +15,44 @@ body {
   background-image: radial-gradient(circle at top, #1a1a1a 0%, #000 70%);
   min-height: 100vh;
   color: #fff;
+}
+
+/* Todo botão vira base de ripple + recebe feedback de toque */
+button {
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  background: rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+  animation: ripple-anim 0.55s var(--ease-out);
+}
+
+@keyframes ripple-anim {
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  button:active:not(:disabled) { transform: none; }
 }
 
 /* ==================== TELA AUTH ==================== */
@@ -70,7 +113,7 @@ body {
   font-size: 13px;
   letter-spacing: 1px;
   text-transform: uppercase;
-  transition: all 0.2s;
+  transition: background 0.25s var(--ease-out), border-color 0.25s var(--ease-out), transform 0.2s var(--ease-spring);
 }
 
 .aba.ativa {
@@ -117,13 +160,35 @@ input:focus { outline: none; border-color: #e30613; }
   font-family: 'Anton', sans-serif;
 }
 
-#btn-acao:hover {
+#btn-acao:hover:not(:disabled) {
   background: #ff0a1c;
   transform: translateY(-2px);
   box-shadow: 0 10px 30px rgba(227, 6, 19, 0.4);
 }
 
 #btn-acao:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+#btn-acao.carregando {
+  color: transparent;
+}
+
+#btn-acao.carregando::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: girar 0.6s linear infinite;
+}
+
+@keyframes girar {
+  to { transform: rotate(360deg); }
+}
 
 .msg {
   margin-top: 18px;
@@ -199,7 +264,7 @@ input:focus { outline: none; border-color: #e30613; }
   border-color: #e30613;
   color: #e30613;
   background: rgba(227, 6, 19, 0.1);
-  transform: scale(1.08);
+  transform: scale(1.08) rotate(-8deg);
 }
 
 .header-menu {
@@ -254,7 +319,7 @@ input:focus { outline: none; border-color: #e30613; }
   margin-top: 8px;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.25s ease;
+  transition: opacity 0.25s var(--ease-out), transform 0.25s var(--ease-out), visibility 0.25s;
   z-index: 200;
 }
 
@@ -358,7 +423,7 @@ input:focus { outline: none; border-color: #e30613; }
 .submenu-mob {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease;
+  transition: max-height 0.35s var(--ease-out);
   margin-left: 16px;
 }
 
@@ -381,6 +446,7 @@ input:focus { outline: none; border-color: #e30613; }
   text-align: left;
   cursor: pointer;
   transition: all 0.2s;
+  position: relative;
 }
 
 .submenu-item:hover {
@@ -450,51 +516,125 @@ input:focus { outline: none; border-color: #e30613; }
   text-transform: uppercase;
 }
 
+/* ==================== PERGUNTA "VOCÊ TREINOU ONTEM?" ==================== */
 .pergunta-ontem {
-  background: #1a1a1a;
-  border: 2px dashed #e30613;
-  border-radius: 8px;
-  padding: 20px;
-  margin: 16px 0;
+  background: linear-gradient(135deg, #1a1a1a 0%, #141414 100%);
+  border: none;
+  border-left: 4px solid #e30613;
+  border-radius: 10px;
+  padding: 24px 22px;
+  margin: 20px 0;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Linha vermelha decorativa no topo */
+.pergunta-ontem::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent,
+    #e30613 50%,
+    transparent);
 }
 
 .pergunta-ontem p {
   font-family: 'Anton', sans-serif;
-  font-size: 15px;
-  letter-spacing: 2px;
+  font-size: 16px;
+  letter-spacing: 2.5px;
   color: #fff;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
   text-transform: uppercase;
+  position: relative;
+  z-index: 1;
 }
 
-.botoes-ontem { display: flex; gap: 10px; }
+.botoes-ontem {
+  display: flex;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
 
-.btn-sim, .btn-nao {
+.btn-sim,
+.btn-nao {
   flex: 1;
-  padding: 14px;
+  padding: 16px 12px;
   border: none;
   border-radius: 999px;
-  font-weight: 900;
-  letter-spacing: 1px;
+  font-family: 'Anton', sans-serif;
+  font-weight: 400;
+  letter-spacing: 1.5px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   text-transform: uppercase;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(.34, 1.56, .64, 1);
+  position: relative;
+  overflow: hidden;
 }
 
-.btn-sim { background: #16a34a; color: #fff; }
-.btn-sim:hover { background: #22c55e; transform: translateY(-2px); }
-.btn-nao { background: #e30613; color: #fff; }
-.btn-nao:hover { background: #ff0a1c; transform: translateY(-2px); }
-
-.treino-box {
-  background: #e30613;
+/* BOTÃO SIM — verde */
+.btn-sim {
+  background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
   color: #fff;
-  padding: 28px 20px;
-  border-radius: 6px;
-  margin: 24px 0;
-  text-align: center;
+  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.3);
+}
+
+.btn-sim:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(22, 163, 74, 0.5);
+}
+
+.btn-sim:active {
+  transform: translateY(-1px);
+}
+
+/* BOTÃO NÃO — vermelho */
+.btn-nao {
+  background: linear-gradient(135deg, #e30613 0%, #ff2a3d 100%);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(227, 6, 19, 0.3);
+}
+
+.btn-nao:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(227, 6, 19, 0.5);
+}
+
+.btn-nao:active {
+  transform: translateY(-1px);
+}
+
+/* Brilho que passa nos botões no hover */
+.btn-sim::before,
+.btn-nao::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.25),
+    transparent);
+  transition: left 0.6s;
+}
+
+.btn-sim:hover::before,
+.btn-nao:hover::before {
+  left: 100%;
+}
+
+@keyframes brilho-treino {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(227, 6, 19, 0.35); }
+  50% { box-shadow: 0 0 0 14px rgba(227, 6, 19, 0); }
 }
 
 .treino-label {
@@ -706,12 +846,38 @@ input:focus { outline: none; border-color: #e30613; }
   background: #1a1a1a;
   border-radius: 8px;
   padding: 20px;
-  height: 500px;
+  height: 600px;
   position: relative;
 }
 
-.grafico-box canvas {
-  max-height: 100%;
+.grafico-scroll {
+  width: 100%;
+  height: 100%;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-color: #e30613 #111;
+  scrollbar-width: thin;
+}
+
+.grafico-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.grafico-scroll::-webkit-scrollbar-track {
+  background: #111;
+  border-radius: 999px;
+}
+
+.grafico-scroll::-webkit-scrollbar-thumb {
+  background: #e30613;
+  border-radius: 999px;
+}
+
+.grafico-scroll-inner {
+  height: 100%;
+  display: inline-block;
+  min-width: 100%;
 }
 
 /* ==================== ABA EXERCÍCIOS ==================== */
@@ -728,7 +894,13 @@ input:focus { outline: none; border-color: #e30613; }
   margin-bottom: 12px;
   overflow: hidden;
   border-left: 4px solid #e30613;
-  animation: fadein 0.3s ease;
+  animation: fadein 0.35s var(--ease-out);
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+}
+
+.card-exercicio:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
 }
 
 .card-exercicio .gif-wrapper {
@@ -780,6 +952,173 @@ input:focus { outline: none; border-color: #e30613; }
   text-transform: uppercase;
 }
 
+.exercicios-loading::after {
+  content: '';
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: 14px auto 0;
+  border: 3px solid #2a2a2a;
+  border-top-color: #e30613;
+  border-radius: 50%;
+  animation: girar 0.7s linear infinite;
+}
+
+/* ==================== ABA PROGRESSO ==================== */
+.form-progresso {
+  margin-top: 16px;
+  animation: fadein 0.3s ease;
+}
+
+.progresso-input-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.progresso-input-box input {
+  margin-bottom: 0;
+}
+
+.progresso-input-box input#input-nome-exercicio {
+  flex: 2;
+}
+
+.progresso-input-box input#input-carga {
+  flex: 1;
+}
+
+#btn-salvar-carga {
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(135deg, #e30613 0%, #ff2a3d 100%);
+  background-size: 200% 200%;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-family: 'Anton', sans-serif;
+  font-size: 15px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(.34, 1.56, .64, 1);
+  box-shadow: 0 6px 20px rgba(227, 6, 19, 0.3);
+  animation: gradient-shift 3s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+#btn-salvar-carga:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(227, 6, 19, 0.5);
+}
+
+#btn-salvar-carga:active:not(:disabled) {
+  transform: translateY(-1px) scale(0.99);
+}
+
+#btn-salvar-carga:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  animation: none;
+}
+
+/* Efeito de brilho que passa por cima do botão */
+#btn-salvar-carga::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent);
+  transition: left 0.6s;
+}
+
+#btn-salvar-carga:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.linha-progresso {
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 6px !important;
+}
+
+.linha-progresso .info-topo {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+}
+
+.linha-progresso .nome-prog {
+  font-family: 'Anton', sans-serif;
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.linha-progresso .peso-prog {
+  color: #e30613;
+  font-size: 16px;
+  font-family: 'Anton', sans-serif;
+  white-space: nowrap;
+}
+
+.linha-progresso .data-prog {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #666;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* ==================== SUBMENU ATIVO ==================== */
+.submenu-item.ativo {
+  color: #fff;
+  background: rgba(227, 6, 19, 0.12);
+  border-left: 3px solid #e30613;
+  padding-left: 14px;
+  font-weight: 900;
+}
+
+.submenu-item.ativo::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #e30613;
+  box-shadow: 0 0 12px rgba(227, 6, 19, 0.6);
+}
+
+/* Botão MEU PESO fica com destaque vermelho quando aberto (mobile) */
+.menu-item-mob.peso-aberto {
+  color: #fff;
+  background: rgba(227, 6, 19, 0.15);
+  border-left: 3px solid #e30613;
+  padding-left: 14px;
+}
+
+/* Botão MEU PESO (desktop) também */
+.menu-item.peso-aberto {
+  color: #fff;
+  background: rgba(227, 6, 19, 0.15);
+}
+
 /* ==================== RESPONSIVO ==================== */
 @media (max-width: 720px) {
   .header-menu { display: none; }
@@ -810,4 +1149,14 @@ input:focus { outline: none; border-color: #e30613; }
   .grafico-box { height: 400px; padding: 12px; }
 
   .filtros-grafico { flex-direction: column; }
+
+  .progresso-input-box {
+    flex-direction: column;
+  }
+
+  .progresso-input-box input#input-nome-exercicio,
+  .progresso-input-box input#input-carga {
+    flex: 1;
+    width: 100%;
+  }
 }

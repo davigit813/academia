@@ -20,11 +20,6 @@ const NOMES_DIAS = {
   4: "Quinta", 5: "Sexta", 6: "Sábado"
 };
 
-const NOMES_MESES = [
-  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
-];
-
 // ====== ELEMENTOS ======
 const telaAuth = document.getElementById("tela-auth");
 const telaApp = document.getElementById("tela-app");
@@ -44,11 +39,41 @@ const msgPeso = document.getElementById("msg-peso");
 const listaHistorico = document.getElementById("lista-historico");
 const semHistorico = document.getElementById("sem-historico");
 
+// Progresso
+const inputNomeExercicio = document.getElementById("input-nome-exercicio");
+const inputCarga = document.getElementById("input-carga");
+const btnSalvarCarga = document.getElementById("btn-salvar-carga");
+const msgProgresso = document.getElementById("msg-progresso");
+const listaProgresso = document.getElementById("lista-progresso");
+const semProgresso = document.getElementById("sem-progresso");
+const formProgresso = document.getElementById("form-progresso");
+
 let modo = "login";
-let graficoPeso = null;
-let dadosPesosCache = [];
+let musculoProgressoAtivo = null;
 
 nomeInput.style.display = "none";
+
+// ====== EFEITO RIPPLE NOS BOTÕES ======
+const prefereMenosMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+document.addEventListener("click", (e) => {
+  if (prefereMenosMovimento) return;
+
+  const btn = e.target.closest("button");
+  if (!btn || btn.disabled) return;
+
+  const rect = btn.getBoundingClientRect();
+  const tamanho = Math.max(rect.width, rect.height);
+  const ripple = document.createElement("span");
+
+  ripple.className = "ripple-effect";
+  ripple.style.width = ripple.style.height = `${tamanho}px`;
+  ripple.style.left = `${e.clientX - rect.left - tamanho / 2}px`;
+  ripple.style.top = `${e.clientY - rect.top - tamanho / 2}px`;
+
+  btn.appendChild(ripple);
+  ripple.addEventListener("animationend", () => ripple.remove());
+});
 
 // ====== TROCA DE ABAS (auth) ======
 abaLogin.onclick = () => {
@@ -75,7 +100,7 @@ form.onsubmit = async (e) => {
   msg.textContent = "";
   msg.className = "msg";
   btnAcao.disabled = true;
-  btnAcao.textContent = "CARREGANDO...";
+  btnAcao.classList.add("carregando");
 
   const email = emailInput.value.trim();
   const senha = senhaInput.value;
@@ -117,6 +142,7 @@ form.onsubmit = async (e) => {
     msg.textContent = traduzErro(err.message);
   } finally {
     btnAcao.disabled = false;
+    btnAcao.classList.remove("carregando");
     btnAcao.textContent = modo === "login" ? "ENTRAR" : "CRIAR CONTA";
   }
 };
@@ -160,22 +186,32 @@ async function entrarNoApp() {
 
 // ====== TROCA DE ABAS ======
 async function trocarAba(nome) {
+  document.querySelectorAll(".submenu-item").forEach(el => el.classList.remove("ativo"));
+  if (nome === "addPeso") {
+    document.getElementById("btn-add-peso-mob")?.classList.add("ativo");
+  } else if (nome === "historico") {
+    document.getElementById("btn-historico-mob")?.classList.add("ativo");
+  }
+  
   const abas = {
+    
     treino: document.getElementById("aba-treino"),
     addPeso: document.getElementById("aba-add-peso"),
     historico: document.getElementById("aba-historico"),
-    grafico: document.getElementById("aba-grafico"),
+    progresso: document.getElementById("aba-progresso"),
     exercicios: document.getElementById("aba-exercicios"),
     semana: document.getElementById("aba-semana")
   };
   const menus = {
     treino: document.getElementById("menu-treino"),
     exercicios: document.getElementById("menu-exercicios"),
+    progresso: document.getElementById("menu-progresso"),
     semana: document.getElementById("menu-semana")
   };
   const menusMob = {
     treino: document.getElementById("menu-treino-mob"),
     exercicios: document.getElementById("menu-exercicios-mob"),
+    progresso: document.getElementById("menu-progresso-mob"),
     semana: document.getElementById("menu-semana-mob")
   };
 
@@ -191,9 +227,10 @@ async function trocarAba(nome) {
     abas.addPeso.classList.remove("escondido");
   } else if (nome === "historico") {
     abas.historico.classList.remove("escondido");
-  } else if (nome === "grafico") {
-    abas.grafico.classList.remove("escondido");
-    await carregarGrafico();
+  } else if (nome === "progresso") {
+    abas.progresso.classList.remove("escondido");
+    menus.progresso.classList.add("ativo");
+    menusMob.progresso.classList.add("ativo");
   } else if (nome === "exercicios") {
     abas.exercicios.classList.remove("escondido");
     menus.exercicios.classList.add("ativo");
@@ -212,9 +249,11 @@ async function trocarAba(nome) {
 document.getElementById("menu-treino").onclick = () => trocarAba("treino");
 document.getElementById("menu-semana").onclick = () => trocarAba("semana");
 document.getElementById("menu-exercicios").onclick = () => trocarAba("exercicios");
+document.getElementById("menu-progresso").onclick = () => trocarAba("progresso");
 document.getElementById("menu-treino-mob").onclick = () => trocarAba("treino");
 document.getElementById("menu-semana-mob").onclick = () => trocarAba("semana");
 document.getElementById("menu-exercicios-mob").onclick = () => trocarAba("exercicios");
+document.getElementById("menu-progresso-mob").onclick = () => trocarAba("progresso");
 
 // ====== DROPDOWN MEU PESO (desktop) ======
 document.getElementById("menu-peso").onclick = (e) => {
@@ -226,7 +265,6 @@ document.getElementById("dropdown-peso").onclick = (e) => {
   e.stopPropagation();
 };
 
-// Fecha dropdown ao clicar fora
 document.addEventListener("click", () => {
   document.getElementById("dropdown-peso").classList.remove("aberto");
 });
@@ -240,11 +278,6 @@ document.getElementById("btn-historico").onclick = async () => {
   document.getElementById("dropdown-peso").classList.remove("aberto");
   await carregarHistorico();
   trocarAba("historico");
-};
-
-document.getElementById("btn-grafico").onclick = () => {
-  document.getElementById("dropdown-peso").classList.remove("aberto");
-  trocarAba("grafico");
 };
 
 // ====== DROPDOWN MEU PESO (mobile) ======
@@ -261,11 +294,7 @@ document.getElementById("btn-historico-mob").onclick = async () => {
   trocarAba("historico");
 };
 
-document.getElementById("btn-grafico-mob").onclick = () => {
-  trocarAba("grafico");
-};
-
-// ====== CARREGAR HISTÓRICO ======
+// ====== CARREGAR HISTÓRICO DE PESO ======
 async function carregarHistorico() {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) return;
@@ -365,272 +394,157 @@ inputPeso.addEventListener("keypress", (e) => {
   if (e.key === "Enter") salvarPeso();
 });
 
-// ====== GRÁFICO ======
-async function carregarGrafico() {
+// ====== ABA PROGRESSO ======
+const MUSCULOS_PROGRESSO = [
+  { label: "PEITO",   musculo: "peito" },
+  { label: "COSTAS",  musculo: "costas" },
+  { label: "PERNA",   musculo: "perna" },
+  { label: "OMBRO",   musculo: "ombro" },
+  { label: "BÍCEPS",  musculo: "biceps" },
+  { label: "TRÍCEPS", musculo: "triceps" }
+];
+
+function montarFiltrosProgresso() {
+  const container = document.getElementById("filtros-progresso");
+  container.innerHTML = "";
+
+  MUSCULOS_PROGRESSO.forEach(m => {
+    const btn = document.createElement("button");
+    btn.className = "filtro-btn";
+    btn.textContent = m.label;
+    btn.onclick = () => selecionarMusculoProgresso(m, btn);
+    container.appendChild(btn);
+  });
+}
+
+async function selecionarMusculoProgresso(musculo, btnClicado) {
+  document.querySelectorAll("#filtros-progresso .filtro-btn").forEach(b => b.classList.remove("ativo"));
+  btnClicado.classList.add("ativo");
+
+  musculoProgressoAtivo = musculo.musculo;
+
+  // Mostra o form
+  formProgresso.classList.remove("escondido");
+
+  // Limpa mensagem
+  msgProgresso.textContent = "";
+  msgProgresso.className = "msg";
+
+  // Carrega o histórico
+  await carregarProgresso(musculo.musculo);
+}
+
+async function carregarProgresso(musculo) {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) return;
 
-  const { data: pesos, error } = await supabaseClient
-    .from("pesos")
-    .select("id, data, peso")
+  const { data: registros, error } = await supabaseClient
+    .from("progresso")
+    .select("id, nome, peso, data")
     .eq("user_id", user.id)
-    .order("data", { ascending: true });
+    .eq("musculo", musculo)
+    .order("data", { ascending: false });
 
   if (error) {
-    console.error("Erro:", error);
+    console.error("Erro ao carregar progresso:", error);
+    msgProgresso.textContent = "ERRO: " + error.message;
+    msgProgresso.className = "msg erro";
     return;
   }
 
-  dadosPesosCache = pesos || [];
+  listaProgresso.innerHTML = "";
 
-  // Popula o select de meses
-  popularSelectMeses();
-
-  // Renderiza o gráfico com filtro padrão (últimos 30 dias)
-  renderizarGrafico("30dias");
-}
-
-function popularSelectMeses() {
-  const select = document.getElementById("select-mes");
-  const meses = new Set();
-
-  dadosPesosCache.forEach(p => {
-    const [ano, mes] = p.data.split("-");
-    meses.add(`${ano}-${mes}`);
-  });
-
-  select.innerHTML = '<option value="">SELECIONE O MÊS</option>';
-
-  [...meses].sort().reverse().forEach(m => {
-    const [ano, mes] = m.split("-");
-    const option = document.createElement("option");
-    option.value = m;
-    option.textContent = `${NOMES_MESES[parseInt(mes) - 1]} / ${ano}`;
-    select.appendChild(option);
-  });
-}
-
-document.getElementById("filtro-30dias").onclick = () => {
-  document.getElementById("filtro-30dias").classList.add("ativo");
-  document.getElementById("select-mes").value = "";
-  renderizarGrafico("30dias");
-};
-
-document.getElementById("select-mes").onchange = (e) => {
-  const valor = e.target.value;
-  document.getElementById("filtro-30dias").classList.remove("ativo");
-
-  if (valor) {
-    renderizarGrafico("mes", valor);
-  }
-};
-
-function renderizarGrafico(tipo, valor) {
-  const canvas = document.getElementById("grafico-peso");
-  const semGrafico = document.getElementById("sem-grafico");
-
-  if (!dadosPesosCache || dadosPesosCache.length === 0) {
-    canvas.classList.add("escondido");
-    semGrafico.classList.remove("escondido");
-    if (graficoPeso) {
-      graficoPeso.destroy();
-      graficoPeso = null;
-    }
+  if (!registros || registros.length === 0) {
+    semProgresso.classList.remove("escondido");
     return;
   }
 
-  canvas.classList.remove("escondido");
-  semGrafico.classList.add("escondido");
+  semProgresso.classList.add("escondido");
 
-  // Filtra os dados
-  let filtrados = [];
-  const hoje = new Date();
+  registros.forEach(r => {
+    const [ano, mes, dia] = r.data.split("-");
+    const li = document.createElement("li");
+    li.className = "linha-historico linha-progresso";
+    li.innerHTML = `
+      <div class="info-topo">
+        <span class="nome-prog">${r.nome}</span>
+        <span class="peso-prog">${r.peso} KG</span>
+      </div>
+      <span class="data-prog">${dia}/${mes}/${ano}</span>
+    `;
+    listaProgresso.appendChild(li);
+  });
+}
 
-  if (tipo === "30dias") {
-    const limite = new Date();
-    limite.setDate(limite.getDate() - 30);
+async function salvarCarga() {
+  const nome = inputNomeExercicio.value.trim();
+  const peso = parseFloat(inputCarga.value);
 
-    filtrados = dadosPesosCache.filter(p => {
-      const d = new Date(p.data + "T00:00:00");
-      return d >= limite && d <= hoje;
-    });
+  msgProgresso.textContent = "";
+  msgProgresso.className = "msg";
 
-  } else if (tipo === "mes" && valor) {
-    const [ano, mes] = valor.split("-");
-    filtrados = dadosPesosCache.filter(p => {
-      const [a, m] = p.data.split("-");
-      return a === ano && m === mes;
-    });
-  }
-
-  if (filtrados.length === 0) {
-    canvas.classList.add("escondido");
-    semGrafico.classList.remove("escondido");
-    if (graficoPeso) {
-      graficoPeso.destroy();
-      graficoPeso = null;
-    }
+  if (!musculoProgressoAtivo) {
+    msgProgresso.textContent = "SELECIONE UM MÚSCULO PRIMEIRO.";
+    msgProgresso.className = "msg erro";
     return;
   }
 
-  // Descobre o mês/ano pra montar o eixo X fixo
-  let anoRef, mesRef;
-  if (tipo === "mes" && valor) {
-    [anoRef, mesRef] = valor.split("-");
-  } else {
-    // Pega o mês do último registro
-    const ultimo = filtrados[filtrados.length - 1];
-    [anoRef, mesRef] = ultimo.data.split("-");
+  if (!nome) {
+    msgProgresso.textContent = "DIGITE O NOME DO EXERCÍCIO.";
+    msgProgresso.className = "msg erro";
+    return;
   }
 
-  const diasNoMes = new Date(parseInt(anoRef), parseInt(mesRef), 0).getDate();
-
-  // Monta labels com TODOS os dias do mês
-  const labels = [];
-  for (let d = 1; d <= diasNoMes; d++) {
-    labels.push(String(d).padStart(2, "0"));
+  if (!peso || peso <= 0 || peso > 1000) {
+    msgProgresso.textContent = "DIGITE UM PESO VÁLIDO.";
+    msgProgresso.className = "msg erro";
+    return;
   }
 
-  // Mapeia os pesos nos dias certos (resto fica null)
-  const valores = new Array(diasNoMes).fill(null);
-  const cores = new Array(diasNoMes).fill(null);
+  btnSalvarCarga.disabled = true;
 
-  filtrados.forEach(p => {
-    const [a, m, dia] = p.data.split("-");
-    if (a === anoRef && m === mesRef) {
-      const index = parseInt(dia) - 1;
-      valores[index] = parseFloat(p.peso);
-    }
-  });
-
-  // Calcula min/max reais (só dos valores não nulos)
-  const numeros = valores.filter(v => v !== null);
-  const minReal = Math.min(...numeros);
-  const maxReal = Math.max(...numeros);
-  const range = maxReal - minReal;
-
-  // Margem: 30% do range (pra dar respiro visual)
-  const margem = range === 0 ? 2 : range * 0.4;
-  const minY = Math.max(0, minReal - margem);
-  const maxY = maxReal + margem;
-
-  // Cor dos pontos: azul se subiu, vermelho se desceu (comparado ao ponto ANTERIOR com valor)
-  const pontoCores = valores.map((v, i) => {
-    if (v === null) return null;
-
-    // Procura o valor anterior não nulo
-    for (let j = i - 1; j >= 0; j--) {
-      if (valores[j] !== null) {
-        return v >= valores[j] ? "#4a9eff" : "#e30613";
-      }
-    }
-    return "#4a9eff"; // primeiro ponto é azul
-  });
-
-  // Cor dos segmentos
-  const segmentCores = valores.map((v, i) => {
-    if (v === null) return null;
-
-    for (let j = i - 1; j >= 0; j--) {
-      if (valores[j] !== null) {
-        return v >= valores[j] ? "#4a9eff" : "#e30613";
-      }
-    }
-    return "#4a9eff";
-  });
-
-  if (graficoPeso) {
-    graficoPeso.destroy();
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) {
+    btnSalvarCarga.disabled = false;
+    return;
   }
 
-  graficoPeso = new Chart(canvas, {
-    type: "line",
-    data: {
-      labels: labels,
-      datasets: [{
-        label: "Peso (kg)",
-        data: valores,
-        borderColor: "#4a9eff",
-        borderWidth: 3,
-        tension: 0.3,
-        fill: false,
-        spanGaps: true, // conecta pontos mesmo com dias vazios no meio
-        pointBackgroundColor: pontoCores,
-        pointBorderColor: "#fff",
-        pointBorderWidth: 2,
-        pointRadius: (ctx) => {
-          // Só mostra bolinha nos dias com registro
-          return valores[ctx.dataIndex] !== null ? 7 : 0;
-        },
-        pointHoverRadius: 9,
-        segment: {
-          borderColor: ctx => {
-            const i = ctx.p1DataIndex;
-            if (segmentCores[i] === null) return "#4a9eff";
-            return segmentCores[i];
-          },
-          borderDash: ctx => {
-            const i = ctx.p1DataIndex;
-            const j = ctx.p0DataIndex;
-            // Tracejado se tem dias vazios no meio
-            for (let k = j + 1; k < i; k++) {
-              if (valores[k] === null) return [5, 5];
-            }
-            return undefined;
-          }
-        }
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: "#1a1a1a",
-          titleColor: "#e30613",
-          bodyColor: "#fff",
-          borderColor: "#e30613",
-          borderWidth: 1,
-          padding: 12,
-          titleFont: { family: "Anton", size: 14 },
-          bodyFont: { family: "Inter", size: 13, weight: "bold" },
-          callbacks: {
-            title: (items) => {
-              const dia = items[0].label;
-              return `DIA ${dia}/${mesRef}`;
-            },
-            label: (ctx) => `${ctx.parsed.y} kg`
-          }
-        }
-      },
-      scales: {
-        y: {
-          min: minY,
-          max: maxY,
-          ticks: {
-            color: "#888",
-            font: { family: "Inter", size: 11, weight: "600" },
-            callback: (v) => v.toFixed(1) + " kg",
-            maxTicksLimit: 6
-          },
-          grid: { color: "#222" }
-        },
-        x: {
-          ticks: {
-            color: "#888",
-            font: { family: "Inter", size: 10, weight: "600" },
-            maxRotation: 0,
-            minRotation: 0,
-            autoSkip: true,
-            maxTicksLimit: 15
-          },
-          grid: { color: "#1a1a1a" }
-        }
-      }
-    }
+  const hoje = new Date().toISOString().split("T")[0];
+
+  const { error } = await supabaseClient.from("progresso").insert({
+    user_id: user.id,
+    musculo: musculoProgressoAtivo,
+    nome: nome.toUpperCase(),
+    peso: peso,
+    data: hoje
   });
+
+  btnSalvarCarga.disabled = false;
+
+  if (error) {
+    msgProgresso.textContent = "ERRO: " + error.message;
+    msgProgresso.className = "msg erro";
+    return;
+  }
+
+  msgProgresso.textContent = "CARGA SALVA! 💪";
+  msgProgresso.className = "msg sucesso";
+
+  inputNomeExercicio.value = "";
+  inputCarga.value = "";
+
+  await carregarProgresso(musculoProgressoAtivo);
 }
+
+btnSalvarCarga.onclick = salvarCarga;
+inputCarga.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") salvarCarga();
+});
+inputNomeExercicio.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") inputCarga.focus();
+});
+
+montarFiltrosProgresso();
 
 // ====== RESUMO DE ONTEM ======
 async function atualizarResumoOntem(userId) {
@@ -640,14 +554,19 @@ async function atualizarResumoOntem(userId) {
   document.getElementById("resumo-ontem").innerHTML = resumo.texto;
 
   const pergunta = document.getElementById("pergunta-ontem");
+  const treinoBox = document.querySelector(".treino-box");
 
   if (resumo.precisaPerguntar) {
+    // Não respondeu ainda → mostra a pergunta, esconde o treino
     pergunta.classList.remove("escondido");
     pergunta.dataset.dataOntem = obterDataOntem();
     btnSeta.classList.add("escondido");
+    treinoBox.classList.add("escondido");
   } else {
+    // Já respondeu → esconde a pergunta, mostra o treino
     pergunta.classList.add("escondido");
     btnSeta.classList.remove("escondido");
+    treinoBox.classList.remove("escondido");
   }
 }
 
