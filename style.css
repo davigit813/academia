@@ -315,8 +315,8 @@ input:focus { outline: none; border-color: #e30613; }
 
 .streak-badge .streak-label {
   font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  font-weight: 800;
+  font-size: 19px;
+  font-weight: 900;
   letter-spacing: 3px;
   color: #888;
   text-transform: uppercase;
