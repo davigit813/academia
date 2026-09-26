@@ -1,5 +1,5 @@
 // Nome do cache (muda a versão pra forçar atualização)
-const CACHE_NAME = "academia-v1";
+const CACHE_NAME = "academia-v2";
 
 // Arquivos que vão ficar em cache (pra funcionar offline)
 const ARQUIVOS_CACHE = [

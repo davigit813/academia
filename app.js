@@ -6,11 +6,11 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ====== TABELA DE TREINOS ======
 const TREINOS = {
-  1: "Peito, ombro e tríceps",
-  2: "Costas, ombro e bíceps",
+  1: "Peito, ombro e bíceps",
+  2: "Costas, ombro e tríceps",
   3: "Perna",
-  4: "Peito, ombro e tríceps",
-  5: "Costas, ombro e bíceps",
+  4: "Peito, ombro e bíceps",
+  5: "Costas, ombro e tríceps",
   6: "Descanso",
   0: "Descanso"
 };
