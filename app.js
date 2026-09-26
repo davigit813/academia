@@ -562,15 +562,15 @@ async function carregarPerfil() {
     const el = document.getElementById("perfil-diferenca");
 
     if (Math.abs(diff) < 0.1) {
-      el.textContent = "SEM MUDANÇA";
-      el.style.color = "#888";
-    } else if (diff < 0) {
-      el.textContent = `${diff.toFixed(1)} KG (PERDEU)`;
-      el.style.color = "#4ade80";
-    } else {
-      el.textContent = `+${diff.toFixed(1)} KG (GANHOU)`;
-      el.style.color = "#ff4b36";
-    }
+  el.textContent = "SEM MUDANÇA";
+  el.style.color = "#888";
+} else if (diff < 0) {
+  el.textContent = `${diff.toFixed(1)} KG (PERDEU)`;
+  el.style.color = "#4ade80";
+} else {
+  el.textContent = `+${diff.toFixed(1)} KG (GANHOU)`;
+  el.style.color = "#ff4b36";
+}
   } else {
     document.getElementById("perfil-peso").textContent = "—";
     document.getElementById("perfil-diferenca").textContent = "—";

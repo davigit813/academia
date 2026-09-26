@@ -201,24 +201,26 @@
           </div>
         </div>
 
-        <!-- Lista wide -->
-        <ul class="perfil-lista">
-          <li>
-            <span class="lista-label">📅 MEMBRO DESDE</span>
-            <span class="lista-valor" id="perfil-membro">—</span>
-          </li>
-          <li>
-            <span class="lista-label">⚖️ PESO ATUAL</span>
-            <span class="lista-valor" id="perfil-peso">—</span>
-          </li>
-          <li>
-            <span class="lista-label">📉 DIFERENÇA DESDE O INÍCIO</span>
-            <span class="lista-valor" id="perfil-diferenca">—</span>
-          </li>
-        </ul>
-      </section>
-    </main>
-  </div>
+        <!-- Grid inferior -->
+        <div class="perfil-grid">
+          <div class="perfil-card">
+            <span class="card-icone">📅</span>
+            <span class="card-label">MEMBRO DESDE</span>
+            <span class="card-valor" id="perfil-membro">—</span>
+          </div>
+
+          <div class="perfil-card destaque-ambar">
+            <span class="card-icone">⚖️</span>
+            <span class="card-label">PESO ATUAL</span>
+            <span class="card-valor" id="perfil-peso">—</span>
+          </div>
+
+          <div class="perfil-card" style="grid-column: 1 / -1;">
+            <span class="card-icone">📉</span>
+            <span class="card-label">DIFERENÇA DESDE O INÍCIO</span>
+            <span class="card-valor" id="perfil-diferenca">—</span>
+          </div>
+        </div>
 
     <!-- AVISO DE ATUALIZAÇÃO (PWA) -->
   <div id="update-banner" class="update-banner">
