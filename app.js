@@ -51,6 +51,13 @@ const formProgresso = document.getElementById("form-progresso");
 let modo = "login";
 let musculoProgressoAtivo = null;
 
+// ====== CACHE DO USUÁRIO LOGADO (evita chamar getUser() toda hora) ======
+let usuarioAtual = null;
+
+supabaseClient.auth.onAuthStateChange((_event, session) => {
+  usuarioAtual = session?.user ?? null;
+});
+
 nomeInput.style.display = "none";
 
 // ====== EFEITO RIPPLE NOS BOTÕES ======
@@ -122,19 +129,25 @@ form.onsubmit = async (e) => {
         nome: nome
       });
 
+      // Usa o usuário que já veio do próprio signUp, sem esperar o onAuthStateChange
+      usuarioAtual = data.user;
+
       msg.className = "msg sucesso";
       msg.textContent = "CONTA CRIADA! ENTRANDO...";
-      await entrarNoApp();
+      await entrarNoApp(usuarioAtual);
 
     } else {
-      const { error } = await supabaseClient.auth.signInWithPassword({
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
         email,
         password: senha
       });
 
       if (error) throw error;
 
-      await entrarNoApp();
+      // Usa o usuário que já veio do próprio login, sem esperar o onAuthStateChange
+      usuarioAtual = data.user;
+
+      await entrarNoApp(usuarioAtual);
     }
 
   } catch (err) {
@@ -148,8 +161,8 @@ form.onsubmit = async (e) => {
 };
 
 // ====== ENTRAR NO APP ======
-async function entrarNoApp() {
-  const { data: { user } } = await supabaseClient.auth.getUser();
+async function entrarNoApp(user) {
+  user = user || usuarioAtual;
   if (!user) return;
 
   const { data: aluno } = await supabaseClient
@@ -296,23 +309,28 @@ document.getElementById("btn-historico-mob").onclick = async () => {
 
 // ====== CARREGAR HISTÓRICO DE PESO ======
 async function carregarHistorico() {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) return;
+  if (!usuarioAtual) return;
 
   const { data: pesos, error } = await supabaseClient
     .from("pesos")
     .select("id, data, peso")
-    .eq("user_id", user.id)
+    .eq("user_id", usuarioAtual.id)
     .order("data", { ascending: false });
 
   if (error) {
     console.error("Erro ao carregar pesos:", error);
+    listaHistorico.innerHTML = "";
+    semHistorico.textContent = "ERRO AO CARREGAR O HISTÓRICO: " + error.message;
+    semHistorico.className = "sem-dados msg erro";
+    semHistorico.classList.remove("escondido");
     return;
   }
 
   listaHistorico.innerHTML = "";
 
   if (!pesos || pesos.length === 0) {
+    semHistorico.textContent = "NENHUM REGISTRO AINDA.";
+    semHistorico.className = "sem-dados";
     semHistorico.classList.remove("escondido");
     return;
   }
@@ -346,8 +364,7 @@ async function salvarPeso() {
 
   btnSalvarPeso.disabled = true;
 
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) {
+  if (!usuarioAtual) {
     btnSalvarPeso.disabled = false;
     return;
   }
@@ -357,7 +374,7 @@ async function salvarPeso() {
   const { data: existente } = await supabaseClient
     .from("pesos")
     .select("id")
-    .eq("user_id", user.id)
+    .eq("user_id", usuarioAtual.id)
     .eq("data", hoje)
     .maybeSingle();
 
@@ -372,7 +389,7 @@ async function salvarPeso() {
   } else {
     const res = await supabaseClient
       .from("pesos")
-      .insert({ user_id: user.id, data: hoje, peso: valor });
+      .insert({ user_id: usuarioAtual.id, data: hoje, peso: valor });
     error = res.error;
   }
 
@@ -435,13 +452,12 @@ async function selecionarMusculoProgresso(musculo, btnClicado) {
 }
 
 async function carregarProgresso(musculo) {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) return;
+  if (!usuarioAtual) return;
 
   const { data: registros, error } = await supabaseClient
     .from("progresso")
     .select("id, nome, peso, data")
-    .eq("user_id", user.id)
+    .eq("user_id", usuarioAtual.id)
     .eq("musculo", musculo)
     .order("data", { ascending: false });
 
@@ -449,12 +465,19 @@ async function carregarProgresso(musculo) {
     console.error("Erro ao carregar progresso:", error);
     msgProgresso.textContent = "ERRO: " + error.message;
     msgProgresso.className = "msg erro";
+
+    listaProgresso.innerHTML = "";
+    semProgresso.textContent = "ERRO AO CARREGAR O PROGRESSO: " + error.message;
+    semProgresso.className = "sem-dados msg erro";
+    semProgresso.classList.remove("escondido");
     return;
   }
 
   listaProgresso.innerHTML = "";
 
   if (!registros || registros.length === 0) {
+    semProgresso.textContent = "NENHUM REGISTRO AINDA.";
+    semProgresso.className = "sem-dados";
     semProgresso.classList.remove("escondido");
     return;
   }
@@ -503,8 +526,7 @@ async function salvarCarga() {
 
   btnSalvarCarga.disabled = true;
 
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) {
+  if (!usuarioAtual) {
     btnSalvarCarga.disabled = false;
     return;
   }
@@ -512,7 +534,7 @@ async function salvarCarga() {
   const hoje = new Date().toISOString().split("T")[0];
 
   const { error } = await supabaseClient.from("progresso").insert({
-    user_id: user.id,
+    user_id: usuarioAtual.id,
     musculo: musculoProgressoAtivo,
     nome: nome.toUpperCase(),
     peso: peso,
@@ -615,11 +637,10 @@ async function salvarCheckin(treinou) {
   const pergunta = document.getElementById("pergunta-ontem");
   const dataOntem = pergunta.dataset.dataOntem || obterDataOntem();
 
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) return;
+  if (!usuarioAtual) return;
 
   const { error } = await supabaseClient.from("checkins").insert({
-    user_id: user.id,
+    user_id: usuarioAtual.id,
     data: dataOntem,
     treinou: treinou
   });
@@ -629,7 +650,7 @@ async function salvarCheckin(treinou) {
     return;
   }
 
-  await atualizarResumoOntem(user.id);
+  await atualizarResumoOntem(usuarioAtual.id);
 }
 
 document.getElementById("btn-treinei").onclick = () => salvarCheckin(true);
@@ -637,15 +658,14 @@ document.getElementById("btn-faltei").onclick = () => salvarCheckin(false);
 
 // ====== SETA = DESFAZER ======
 btnSeta.onclick = async () => {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) return;
+  if (!usuarioAtual) return;
 
   const dataOntem = obterDataOntem();
 
   const { error } = await supabaseClient
     .from("checkins")
     .delete()
-    .eq("user_id", user.id)
+    .eq("user_id", usuarioAtual.id)
     .eq("data", dataOntem);
 
   if (error) {
@@ -653,12 +673,13 @@ btnSeta.onclick = async () => {
     return;
   }
 
-  await atualizarResumoOntem(user.id);
+  await atualizarResumoOntem(usuarioAtual.id);
 };
 
 // ====== SAIR ======
 async function sair() {
   await supabaseClient.auth.signOut();
+  usuarioAtual = null;
   telaApp.classList.add("escondido");
   telaAuth.classList.remove("escondido");
   form.reset();
@@ -945,6 +966,18 @@ const DICIONARIO_PALAVRAS = {
   "v bar": "V-BAR", "over": "SOBRE", "under": "SOB"
 };
 
+// Calculado UMA ÚNICA VEZ (fora da função), em vez de a cada chamada de traduzirNome.
+// Chaves de 1 letra são filtradas, igual já era feito antes.
+const CHAVES_DICIONARIO_ORDENADAS = Object.keys(DICIONARIO_PALAVRAS)
+  .filter(chave => chave.length > 1)
+  .sort((a, b) => b.length - a.length);
+
+// Regex já pré-compiladas uma única vez, pareadas com a tradução correspondente.
+const REGEX_DICIONARIO = CHAVES_DICIONARIO_ORDENADAS.map(chave => ({
+  regex: new RegExp(`\\b${chave.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi"),
+  traducao: DICIONARIO_PALAVRAS[chave]
+}));
+
 function traduzirNome(nome) {
   if (!nome) return "";
 
@@ -954,15 +987,16 @@ function traduzirNome(nome) {
     return TRADUCOES_EXATAS[lower];
   }
 
-  const chaves = Object.keys(DICIONARIO_PALAVRAS).sort((a, b) => b.length - a.length);
   let restante = " " + lower + " ";
 
-  chaves.forEach(chave => {
-    if (chave.length <= 1) return;
-
-    const regex = new RegExp(`\\b${chave.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi");
+  REGEX_DICIONARIO.forEach(({ regex, traducao }) => {
+    // Regex com flag "g" guardam posição em lastIndex entre usos;
+    // como reaproveitamos a mesma regex em várias chamadas, é preciso
+    // resetar antes de cada teste, senão o resultado fica errado.
+    regex.lastIndex = 0;
     if (regex.test(restante)) {
-      restante = restante.replace(regex, ` ${DICIONARIO_PALAVRAS[chave]} `);
+      regex.lastIndex = 0;
+      restante = restante.replace(regex, ` ${traducao} `);
     }
   });
 
@@ -1072,6 +1106,16 @@ async function selecionarMusculo(musculo, btnClicado) {
     lista.appendChild(li);
   });
 
+  iniciarIntervaloGifs();
+}
+
+// Extraída pra fora de selecionarMusculo() pra poder ser chamada de novo
+// quando a aba volta a ficar visível (ver visibilitychange mais abaixo).
+function iniciarIntervaloGifs() {
+  if (intervaloGifs) {
+    clearInterval(intervaloGifs);
+  }
+
   intervaloGifs = setInterval(() => {
     document.querySelectorAll(".card-exercicio img").forEach(img => {
       const img0 = img.dataset.img0;
@@ -1092,8 +1136,26 @@ async function selecionarMusculo(musculo, btnClicado) {
 
 montarFiltros();
 
+// ====== PAUSAR/RETOMAR GIFS QUANDO A ABA FICA OCULTA ======
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    if (intervaloGifs) {
+      clearInterval(intervaloGifs);
+      intervaloGifs = null;
+    }
+  } else {
+    // Só reinicia se ainda houver cards de exercício na tela
+    if (document.querySelector(".card-exercicio img")) {
+      iniciarIntervaloGifs();
+    }
+  }
+});
+
 // ====== VERIFICA SE JÁ ESTÁ LOGADO ======
+// Única chamada de inicialização: getSession() só lê a sessão local (sem round-trip
+// de validação ao servidor como getUser()), e popula usuarioAtual antes de tudo.
 (async () => {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (user) entrarNoApp();
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  usuarioAtual = session?.user ?? null;
+  if (usuarioAtual) entrarNoApp(usuarioAtual);
 })();
