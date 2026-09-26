@@ -71,3 +71,10 @@ self.addEventListener("fetch", (event) => {
     })
   );
 });
+
+// ====== RESPONDE AO PEDIDO DE SKIP_WAITING (vindo do frontend) ======
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});

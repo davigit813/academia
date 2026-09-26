@@ -164,12 +164,59 @@
     </main>
   </div>
 
+    <!-- AVISO DE ATUALIZAÇÃO (PWA) -->
+  <div id="update-banner" class="update-banner">
+    <span class="update-texto">
+      <strong>Nova versão disponível!</strong> Toque pra atualizar.
+    </span>
+    <button id="update-btn" class="update-btn">Atualizar</button>
+  </div>
+
 <script>
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("/sw.js")
-        .then((reg) => console.log("Service Worker registrado:", reg))
+        .then((reg) => {
+          console.log("Service Worker registrado:", reg);
+
+          // ====== VERIFICA SE TEM ATUALIZAÇÃO ======
+          reg.addEventListener("updatefound", () => {
+            const novoWorker = reg.installing;
+            if (!novoWorker) return;
+
+            novoWorker.addEventListener("statechange", () => {
+              // Quando o novo SW tá instalado e já tem um antigo controlando a página
+              if (novoWorker.state === "installed" && navigator.serviceWorker.controller) {
+                mostrarBannerAtualizacao();
+              }
+            });
+          });
+        })
         .catch((err) => console.error("Erro no Service Worker:", err));
+    });
+
+    // ====== FUNÇÃO PRA MOSTRAR O BANNER ======
+    function mostrarBannerAtualizacao() {
+      const banner = document.getElementById("update-banner");
+      if (banner) banner.classList.add("visivel");
+    }
+
+    // ====== CLIQUE NO BOTÃO "ATUALIZAR" ======
+    document.addEventListener("DOMContentLoaded", () => {
+      const btn = document.getElementById("update-btn");
+      if (btn) {
+        btn.addEventListener("click", () => {
+          // Diz pro SW novo assumir o controle
+          navigator.serviceWorker.getRegistration().then((reg) => {
+            if (reg && reg.waiting) {
+              reg.waiting.postMessage({ type: "SKIP_WAITING" });
+            }
+          });
+
+          // Recarrega a página
+          window.location.reload();
+        });
+      }
     });
   }
 </script>
