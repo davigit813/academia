@@ -640,6 +640,9 @@ function obterDataOntem() {
 // Conta quantos dias ÚTEIS seguidos (segunda a sexta) o usuário marcou
 // "treinei", sem nenhum buraco no meio. Sábado e domingo não contam
 // (pausa, não quebra a sequência).
+// Conta quantos dias ÚTEIS seguidos (segunda a sexta) o usuário marcou
+// "treinei", sem nenhum buraco no meio. Sábado e domingo não contam
+// (pausa, não quebra a sequência).
 async function calcularStreak(userId) {
   const { data: checkins, error } = await supabaseClient
     .from("checkins")
@@ -656,83 +659,81 @@ async function calcularStreak(userId) {
     mapa[c.data] = c.treinou;
   });
 
-  // Função auxiliar: devolve a data anterior (ou pula o fim de semana)
+  // Helpers
+  function ehDiaUtil(dataStr) {
+    const dow = new Date(dataStr + "T00:00:00").getDay();
+    return dow >= 1 && dow <= 5; // 1=seg, 5=sex
+  }
+
   function diaUtilAnterior(dataStr) {
     const d = new Date(dataStr + "T00:00:00");
     do {
       d.setDate(d.getDate() - 1);
-    } while (d.getDay() === 0 || d.getDay() === 6); // pula sáb (6) e dom (0)
+    } while (d.getDay() === 0 || d.getDay() === 6);
     return d.toISOString().split("T")[0];
   }
 
-  // Começa do dia útil mais recente que tem checkin
-  // (o mais recente da lista pode ser sábado ou domingo — a gente pula)
-  let dataAtual = null;
+  function ehMesmoDiaOuDepois(dataA, dataB) {
+    return new Date(dataA + "T00:00:00") >= new Date(dataB + "T00:00:00");
+  }
 
+  // ====== 1) Descobre o último dia útil esperado (com base em hoje) ======
+  const hojeStr = new Date().toISOString().split("T")[0];
+  const dowHoje = new Date(hojeStr + "T00:00:00").getDay();
+
+  let ultimoDiaUtilEsperado;
+
+  if (dowHoje === 0) {
+    // Domingo → último dia útil foi sexta
+    const d = new Date(hojeStr + "T00:00:00");
+    d.setDate(d.getDate() - 2);
+    ultimoDiaUtilEsperado = d.toISOString().split("T")[0];
+  } else if (dowHoje === 6) {
+    // Sábado → último dia útil foi sexta
+    const d = new Date(hojeStr + "T00:00:00");
+    d.setDate(d.getDate() - 1);
+    ultimoDiaUtilEsperado = d.toISOString().split("T")[0];
+  } else {
+    // Dia útil
+    if (mapa[hojeStr] !== undefined) {
+      // Já respondeu hoje
+      ultimoDiaUtilEsperado = hojeStr;
+    } else {
+      // Não respondeu hoje ainda → espera o dia útil anterior
+      ultimoDiaUtilEsperado = diaUtilAnterior(hojeStr);
+    }
+  }
+
+  // ====== 2) Pega o checkin mais recente EM DIA ÚTIL ======
+  let dataInicial = null;
   for (const c of checkins) {
-    const d = new Date(c.data + "T00:00:00");
-    const dow = d.getDay();
-    // Só considera dias úteis (seg-sex)
-    if (dow >= 1 && dow <= 5) {
-      dataAtual = c.data;
+    if (ehDiaUtil(c.data)) {
+      dataInicial = c.data;
       break;
     }
   }
 
-  if (!dataAtual) return 0;
+  if (!dataInicial) return 0;
 
-  // Verifica se o dia útil mais recente foi "treinei". Se não, streak = 0
-  if (!mapa[dataAtual]) return 0;
-
-  // Verifica se ainda tá "ativo": o último dia útil com checkin precisa
-  // ser ontem, hoje, ou o último dia útil antes de hoje (caso hoje seja
-  // sábado/domingo e o último checkin tenha sido na sexta).
-  const hoje = new Date();
-  const diaHoje = hoje.getDay(); // 0=dom, 6=sáb
-  let ultimoDiaUtilEsperado;
-
-  if (diaHoje === 0) {
-    // Hoje é domingo → último dia útil foi sexta
-    const d = new Date(hoje);
-    d.setDate(d.getDate() - 2);
-    ultimoDiaUtilEsperado = d.toISOString().split("T")[0];
-  } else if (diaHoje === 6) {
-    // Hoje é sábado → último dia útil foi sexta
-    const d = new Date(hoje);
-    d.setDate(d.getDate() - 1);
-    ultimoDiaUtilEsperado = d.toISOString().split("T")[0];
-  } else {
-    // Dia útil → pode ser hoje ou o dia útil anterior
-    // (pra dar tempo do usuário responder antes de dormir)
-    const dHoje = hoje.toISOString().split("T")[0];
-    const dAnterior = diaUtilAnterior(dHoje);
-    ultimoDiaUtilEsperado = dHoje;
-
-    // Se não tem checkin hoje, aceita o último dia útil anterior
-    if (!mapa[dHoje]) {
-      ultimoDiaUtilEsperado = dAnterior;
-    }
-  }
-
-  if (dataAtual !== ultimoDiaUtilEsperado) {
-    // O último checkin tá mais antigo que o esperado → streak esfriou
+  // ====== 3) Se o checkin mais recente é mais antigo que o esperado, esfriou ======
+  // (Aceita também se for o próprio dia esperado ou mais recente)
+  if (!ehMesmoDiaOuDepois(dataInicial, ultimoDiaUtilEsperado)) {
     return 0;
   }
 
-  // Conta os dias úteis seguidos pra trás
+  // ====== 4) Se o checkin mais recente for "não treinei", streak = 0 ======
+  if (mapa[dataInicial] !== true) return 0;
+
+  // ====== 5) Conta pra trás ======
   let streak = 0;
-  let cursor = dataAtual;
+  let cursor = dataInicial;
 
   while (mapa[cursor] === true) {
     streak++;
     cursor = diaUtilAnterior(cursor);
 
-    // Se o próximo dia útil não tem checkin, para
-    if (mapa[cursor] === undefined) {
-      // Verifica se pulou pra um dia que ainda não passou
-      // (não conta se for futuro)
-      break;
-    }
+    // Se o dia útil anterior não tem checkin registrado, para
+    if (mapa[cursor] === undefined) break;
   }
 
   return streak;
@@ -749,7 +750,10 @@ async function atualizarStreak(userId) {
     return;
   }
 
-  badge.textContent = `🔥 ${streak} ${streak === 1 ? "DIA" : "DIAS"} DE TREINO`;
+  const numero = badge.querySelector(".streak-numero");
+  if (numero) {
+    numero.textContent = `${streak} ${streak === 1 ? "DIA" : "DIAS"}`;
+  }
   badge.classList.remove("escondido");
 }
 
