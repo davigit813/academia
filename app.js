@@ -191,6 +191,7 @@ async function entrarNoApp(user) {
   });
 
   await atualizarResumoOntem(user.id);
+  await atualizarStreak(user.id);
   trocarAba("treino");
 
   telaAuth.classList.add("escondido");
@@ -632,6 +633,126 @@ function obterDataOntem() {
   return d.toISOString().split("T")[0];
 }
 
+// ====== STREAK (SEQUÊNCIA DE DIAS TREINANDO) ======
+
+// Conta quantos dias seguidos (de trás pra frente, a partir do check-in
+// mais recente) o usuário marcou "treinei", sem nenhum buraco no meio.
+// Conta quantos dias ÚTEIS seguidos (segunda a sexta) o usuário marcou
+// "treinei", sem nenhum buraco no meio. Sábado e domingo não contam
+// (pausa, não quebra a sequência).
+async function calcularStreak(userId) {
+  const { data: checkins, error } = await supabaseClient
+    .from("checkins")
+    .select("data, treinou")
+    .eq("user_id", userId)
+    .order("data", { ascending: false })
+    .limit(400);
+
+  if (error || !checkins || checkins.length === 0) return 0;
+
+  // Monta um mapa { "2026-09-25": true/false } pra busca rápida
+  const mapa = {};
+  checkins.forEach(c => {
+    mapa[c.data] = c.treinou;
+  });
+
+  // Função auxiliar: devolve a data anterior (ou pula o fim de semana)
+  function diaUtilAnterior(dataStr) {
+    const d = new Date(dataStr + "T00:00:00");
+    do {
+      d.setDate(d.getDate() - 1);
+    } while (d.getDay() === 0 || d.getDay() === 6); // pula sáb (6) e dom (0)
+    return d.toISOString().split("T")[0];
+  }
+
+  // Começa do dia útil mais recente que tem checkin
+  // (o mais recente da lista pode ser sábado ou domingo — a gente pula)
+  let dataAtual = null;
+
+  for (const c of checkins) {
+    const d = new Date(c.data + "T00:00:00");
+    const dow = d.getDay();
+    // Só considera dias úteis (seg-sex)
+    if (dow >= 1 && dow <= 5) {
+      dataAtual = c.data;
+      break;
+    }
+  }
+
+  if (!dataAtual) return 0;
+
+  // Verifica se o dia útil mais recente foi "treinei". Se não, streak = 0
+  if (!mapa[dataAtual]) return 0;
+
+  // Verifica se ainda tá "ativo": o último dia útil com checkin precisa
+  // ser ontem, hoje, ou o último dia útil antes de hoje (caso hoje seja
+  // sábado/domingo e o último checkin tenha sido na sexta).
+  const hoje = new Date();
+  const diaHoje = hoje.getDay(); // 0=dom, 6=sáb
+  let ultimoDiaUtilEsperado;
+
+  if (diaHoje === 0) {
+    // Hoje é domingo → último dia útil foi sexta
+    const d = new Date(hoje);
+    d.setDate(d.getDate() - 2);
+    ultimoDiaUtilEsperado = d.toISOString().split("T")[0];
+  } else if (diaHoje === 6) {
+    // Hoje é sábado → último dia útil foi sexta
+    const d = new Date(hoje);
+    d.setDate(d.getDate() - 1);
+    ultimoDiaUtilEsperado = d.toISOString().split("T")[0];
+  } else {
+    // Dia útil → pode ser hoje ou o dia útil anterior
+    // (pra dar tempo do usuário responder antes de dormir)
+    const dHoje = hoje.toISOString().split("T")[0];
+    const dAnterior = diaUtilAnterior(dHoje);
+    ultimoDiaUtilEsperado = dHoje;
+
+    // Se não tem checkin hoje, aceita o último dia útil anterior
+    if (!mapa[dHoje]) {
+      ultimoDiaUtilEsperado = dAnterior;
+    }
+  }
+
+  if (dataAtual !== ultimoDiaUtilEsperado) {
+    // O último checkin tá mais antigo que o esperado → streak esfriou
+    return 0;
+  }
+
+  // Conta os dias úteis seguidos pra trás
+  let streak = 0;
+  let cursor = dataAtual;
+
+  while (mapa[cursor] === true) {
+    streak++;
+    cursor = diaUtilAnterior(cursor);
+
+    // Se o próximo dia útil não tem checkin, para
+    if (mapa[cursor] === undefined) {
+      // Verifica se pulou pra um dia que ainda não passou
+      // (não conta se for futuro)
+      break;
+    }
+  }
+
+  return streak;
+}
+
+async function atualizarStreak(userId) {
+  const badge = document.getElementById("streak-treino");
+  if (!badge) return;
+
+  const streak = await calcularStreak(userId);
+
+  if (streak <= 0) {
+    badge.classList.add("escondido");
+    return;
+  }
+
+  badge.textContent = `🔥 ${streak} ${streak === 1 ? "DIA" : "DIAS"} DE TREINO`;
+  badge.classList.remove("escondido");
+}
+
 // ====== SALVAR CHECKIN ======
 async function salvarCheckin(treinou) {
   const pergunta = document.getElementById("pergunta-ontem");
@@ -651,6 +772,7 @@ async function salvarCheckin(treinou) {
   }
 
   await atualizarResumoOntem(usuarioAtual.id);
+  await atualizarStreak(usuarioAtual.id);
 }
 
 document.getElementById("btn-treinei").onclick = () => salvarCheckin(true);
@@ -674,6 +796,7 @@ btnSeta.onclick = async () => {
   }
 
   await atualizarResumoOntem(usuarioAtual.id);
+  await atualizarStreak(usuarioAtual.id);
 };
 
 // ====== SAIR ======
