@@ -206,9 +206,6 @@ async function trocarAba(nome) {
   } else if (nome === "historico") {
     document.getElementById("btn-historico-mob")?.classList.add("ativo");
   }
-  document.getElementById("menu-perfil").onclick = () => trocarAba("perfil");
-  document.getElementById("menu-perfil-mob").onclick = () => trocarAba("perfil");
-
 
   const abas = {
     treino: document.getElementById("aba-treino"),
@@ -269,6 +266,17 @@ async function trocarAba(nome) {
   document.getElementById("dropdown-peso").classList.remove("aberto");
   document.getElementById("submenu-peso-mob").classList.remove("aberto");
 }
+
+document.getElementById("menu-treino").onclick = () => trocarAba("treino");
+document.getElementById("menu-semana").onclick = () => trocarAba("semana");
+document.getElementById("menu-exercicios").onclick = () => trocarAba("exercicios");
+document.getElementById("menu-progresso").onclick = () => trocarAba("progresso");
+document.getElementById("menu-perfil").onclick = () => trocarAba("perfil");
+document.getElementById("menu-treino-mob").onclick = () => trocarAba("treino");
+document.getElementById("menu-semana-mob").onclick = () => trocarAba("semana");
+document.getElementById("menu-exercicios-mob").onclick = () => trocarAba("exercicios");
+document.getElementById("menu-progresso-mob").onclick = () => trocarAba("progresso");
+document.getElementById("menu-perfil-mob").onclick = () => trocarAba("perfil");
 
 // ====== DROPDOWN MEU PESO (mobile) ======
 document.getElementById("menu-peso-mob").onclick = () => {
