@@ -199,6 +199,7 @@ async function entrarNoApp(user) {
 }
 
 // ====== TROCA DE ABAS ======
+// ====== TROCA DE ABAS ======
 async function trocarAba(nome) {
   document.querySelectorAll(".submenu-item").forEach(el => el.classList.remove("ativo"));
   if (nome === "addPeso") {
@@ -267,6 +268,7 @@ async function trocarAba(nome) {
   document.getElementById("submenu-peso-mob").classList.remove("aberto");
 }
 
+// ====== EVENTOS DOS MENUS ======
 document.getElementById("menu-treino").onclick = () => trocarAba("treino");
 document.getElementById("menu-semana").onclick = () => trocarAba("semana");
 document.getElementById("menu-exercicios").onclick = () => trocarAba("exercicios");
@@ -277,6 +279,11 @@ document.getElementById("menu-semana-mob").onclick = () => trocarAba("semana");
 document.getElementById("menu-exercicios-mob").onclick = () => trocarAba("exercicios");
 document.getElementById("menu-progresso-mob").onclick = () => trocarAba("progresso");
 document.getElementById("menu-perfil-mob").onclick = () => trocarAba("perfil");
+
+// ====== DROPDOWN MEU PESO (desktop) ======
+document.getElementById("menu-peso").onclick = () => {
+  document.getElementById("dropdown-peso").classList.toggle("aberto");
+};
 
 // ====== DROPDOWN MEU PESO (mobile) ======
 document.getElementById("menu-peso-mob").onclick = () => {
