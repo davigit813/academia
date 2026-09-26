@@ -171,40 +171,52 @@
         <ul id="lista-semana" class="lista-semana"></ul>
       </section>
 
-            <!-- ABA: PERFIL -->
+           <!-- ABA: PERFIL -->
       <section id="aba-perfil" class="aba-conteudo escondido">
         <h2 class="titulo-secao">PERFIL</h2>
 
         <div class="perfil-nome" id="perfil-nome">—</div>
 
-        <ul class="perfil-stats">
+        <!-- Destaque: Streak atual -->
+        <div class="perfil-destaque">
+          <div class="destaque-info">
+            <span class="destaque-label">🔥 STREAK ATUAL</span>
+            <span class="destaque-nome">SEQUÊNCIA</span>
+          </div>
+          <span class="destaque-valor" id="perfil-streak">—</span>
+        </div>
+
+        <!-- Grid de estatísticas -->
+        <div class="perfil-grid">
+          <div class="perfil-card destaque-ambar">
+            <span class="card-icone">🏆</span>
+            <span class="card-label">MELHOR STREAK</span>
+            <span class="card-valor" id="perfil-melhor-streak">—</span>
+          </div>
+
+          <div class="perfil-card">
+            <span class="card-icone">🏋️</span>
+            <span class="card-label">TREINOS TOTAIS</span>
+            <span class="card-valor" id="perfil-treinos">—</span>
+          </div>
+        </div>
+
+        <!-- Lista wide -->
+        <ul class="perfil-lista">
           <li>
-            <span class="perfil-label">📅 MEMBRO DESDE</span>
-            <span class="perfil-valor" id="perfil-membro">—</span>
+            <span class="lista-label">📅 MEMBRO DESDE</span>
+            <span class="lista-valor" id="perfil-membro">—</span>
           </li>
           <li>
-            <span class="perfil-label">🏋️ TREINOS TOTAIS</span>
-            <span class="perfil-valor" id="perfil-treinos">—</span>
+            <span class="lista-label">⚖️ PESO ATUAL</span>
+            <span class="lista-valor" id="perfil-peso">—</span>
           </li>
           <li>
-            <span class="perfil-label">🔥 STREAK ATUAL</span>
-            <span class="perfil-valor" id="perfil-streak">—</span>
-          </li>
-          <li>
-            <span class="perfil-label">🏆 MELHOR STREAK</span>
-            <span class="perfil-valor" id="perfil-melhor-streak">—</span>
-          </li>
-          <li>
-            <span class="perfil-label">⚖️ PESO ATUAL</span>
-            <span class="perfil-valor" id="perfil-peso">—</span>
-          </li>
-          <li>
-            <span class="perfil-label">📉 DIFERENÇA DESDE O INÍCIO</span>
-            <span class="perfil-valor" id="perfil-diferenca">—</span>
+            <span class="lista-label">📉 DIFERENÇA DESDE O INÍCIO</span>
+            <span class="lista-valor" id="perfil-diferenca">—</span>
           </li>
         </ul>
       </section>
-
     </main>
   </div>
 

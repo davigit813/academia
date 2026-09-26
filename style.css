@@ -1273,35 +1273,165 @@ input:focus { outline: none; border-color: #e30613; }
 /* ==================== ABA PERFIL ==================== */
 .perfil-nome {
   font-family: 'Anton', sans-serif;
-  font-size: 26px;
-  letter-spacing: 1px;
+  font-size: 32px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: #e30613;
+  color: #fff;
   text-align: center;
   margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid #1a1a1a;
+  line-height: 1.1;
+  position: relative;
+  padding-bottom: 18px;
 }
 
-.perfil-stats {
+.perfil-nome::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: #e30613;
+  border-radius: 3px;
+  box-shadow: 0 0 12px rgba(227, 6, 19, 0.6);
+}
+
+/* Destaque: Streak atual */
+.perfil-destaque {
+  background: linear-gradient(135deg, #1a1a1a 0%, #141414 100%);
+  border: 1px solid #2a2a2a;
+  border-left: 4px solid #e30613;
+  border-radius: 12px;
+  padding: 20px 22px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.perfil-destaque::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #e30613 50%, transparent);
+}
+
+.perfil-destaque .destaque-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.perfil-destaque .destaque-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.perfil-destaque .destaque-nome {
+  font-family: 'Anton', sans-serif;
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: #fff;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.perfil-destaque .destaque-valor {
+  font-family: 'Anton', sans-serif;
+  font-size: 40px;
+  letter-spacing: 1px;
+  color: #e30613;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(227, 6, 19, 0.4);
+  white-space: nowrap;
+}
+
+/* Grid de estatísticas */
+.perfil-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.perfil-card {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.perfil-card:hover {
+  border-color: #e30613;
+  transform: translateY(-2px);
+}
+
+.perfil-card .card-icone {
+  font-size: 20px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.perfil-card .card-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.perfil-card .card-valor {
+  font-family: 'Anton', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.5px;
+  color: #fff;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.perfil-card.destaque-ambar .card-valor {
+  color: #f59e0b;
+}
+
+/* Lista wide */
+.perfil-lista {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.perfil-stats li {
+.perfil-lista li {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  padding: 16px 18px;
+  padding: 14px 16px;
   margin-bottom: 8px;
   background: #1a1a1a;
+  border: 1px solid #2a2a2a;
   border-radius: 8px;
   border-left: 3px solid #e30613;
 }
 
-.perfil-label {
+.perfil-lista .lista-label {
   font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
@@ -1310,7 +1440,7 @@ input:focus { outline: none; border-color: #e30613; }
   text-transform: uppercase;
 }
 
-.perfil-valor {
+.perfil-lista .lista-valor {
   font-family: 'Anton', sans-serif;
   font-size: 17px;
   letter-spacing: 0.5px;
@@ -1362,14 +1492,26 @@ input:focus { outline: none; border-color: #e30613; }
   }
 
   .perfil-nome {
-    font-size: 22px;
+    font-size: 24px;
   }
 
-  .perfil-valor {
-    font-size: 15px;
+  .perfil-destaque {
+    padding: 16px 18px;
   }
 
-  .perfil-stats li {
-    padding: 14px 14px;
+  .perfil-destaque .destaque-valor {
+    font-size: 32px;
+  }
+
+  .perfil-destaque .destaque-nome {
+    font-size: 18px;
+  }
+
+  .perfil-card {
+    padding: 14px 12px;
+  }
+
+  .perfil-card .card-valor {
+    font-size: 18px;
   }
 }
