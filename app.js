@@ -356,7 +356,7 @@ async function salvarPeso() {
   msgPeso.textContent = "";
   msgPeso.className = "msg";
 
-  if (!valor || valor <= 0 || valor > 200) {
+  if (!valor || valor <= 0 || valor > 500) {
     msgPeso.textContent = "DIGITE UM PESO VÁLIDO.";
     msgPeso.className = "msg erro";
     return;
