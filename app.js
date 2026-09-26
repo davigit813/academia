@@ -285,6 +285,15 @@ document.getElementById("menu-peso").onclick = () => {
   document.getElementById("dropdown-peso").classList.toggle("aberto");
 };
 
+document.getElementById("btn-add-peso").onclick = () => {
+  trocarAba("addPeso");
+};
+
+document.getElementById("btn-historico").onclick = async () => {
+  await carregarHistorico();
+  trocarAba("historico");
+};
+
 // ====== DROPDOWN MEU PESO (mobile) ======
 document.getElementById("menu-peso-mob").onclick = () => {
   document.getElementById("submenu-peso-mob").classList.toggle("aberto");
