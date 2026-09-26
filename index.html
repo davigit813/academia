@@ -56,6 +56,7 @@
           <button id="menu-exercicios" class="menu-item">EXERCÍCIOS</button>
           <button id="menu-progresso" class="menu-item">PROGRESSO</button>
           <button id="menu-semana" class="menu-item">SEMANA COMPLETA</button>
+          <button id="menu-perfil" class="menu-item">PERFIL</button>
         </nav>
 
         <button id="btn-sair" class="btn-sair-topo">SAIR</button>
@@ -72,6 +73,7 @@
         <button id="menu-exercicios-mob" class="menu-item-mob">EXERCÍCIOS</button>
         <button id="menu-progresso-mob" class="menu-item-mob">PROGRESSO</button>
         <button id="menu-semana-mob" class="menu-item-mob">SEMANA COMPLETA</button>
+        <button id="menu-perfil-mob" class="menu-item-mob">PERFIL</button>
         <button id="btn-sair-mob" class="menu-item-mob sair">SAIR</button>
       </nav>
     </header>
@@ -167,6 +169,40 @@
       <section id="aba-semana" class="aba-conteudo escondido">
         <h2 class="titulo-secao">SEMANA COMPLETA</h2>
         <ul id="lista-semana" class="lista-semana"></ul>
+      </section>
+
+            <!-- ABA: PERFIL -->
+      <section id="aba-perfil" class="aba-conteudo escondido">
+        <h2 class="titulo-secao">PERFIL</h2>
+
+        <div class="perfil-nome" id="perfil-nome">—</div>
+
+        <ul class="perfil-stats">
+          <li>
+            <span class="perfil-label">📅 MEMBRO DESDE</span>
+            <span class="perfil-valor" id="perfil-membro">—</span>
+          </li>
+          <li>
+            <span class="perfil-label">🏋️ TREINOS TOTAIS</span>
+            <span class="perfil-valor" id="perfil-treinos">—</span>
+          </li>
+          <li>
+            <span class="perfil-label">🔥 STREAK ATUAL</span>
+            <span class="perfil-valor" id="perfil-streak">—</span>
+          </li>
+          <li>
+            <span class="perfil-label">🏆 MELHOR STREAK</span>
+            <span class="perfil-valor" id="perfil-melhor-streak">—</span>
+          </li>
+          <li>
+            <span class="perfil-label">⚖️ PESO ATUAL</span>
+            <span class="perfil-valor" id="perfil-peso">—</span>
+          </li>
+          <li>
+            <span class="perfil-label">📉 DIFERENÇA DESDE O INÍCIO</span>
+            <span class="perfil-valor" id="perfil-diferenca">—</span>
+          </li>
+        </ul>
       </section>
 
     </main>

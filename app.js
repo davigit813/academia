@@ -206,27 +206,32 @@ async function trocarAba(nome) {
   } else if (nome === "historico") {
     document.getElementById("btn-historico-mob")?.classList.add("ativo");
   }
-  
+  document.getElementById("menu-perfil").onclick = () => trocarAba("perfil");
+  document.getElementById("menu-perfil-mob").onclick = () => trocarAba("perfil");
+
+
   const abas = {
-    
     treino: document.getElementById("aba-treino"),
     addPeso: document.getElementById("aba-add-peso"),
     historico: document.getElementById("aba-historico"),
     progresso: document.getElementById("aba-progresso"),
     exercicios: document.getElementById("aba-exercicios"),
-    semana: document.getElementById("aba-semana")
+    semana: document.getElementById("aba-semana"),
+    perfil: document.getElementById("aba-perfil")
   };
   const menus = {
     treino: document.getElementById("menu-treino"),
     exercicios: document.getElementById("menu-exercicios"),
     progresso: document.getElementById("menu-progresso"),
-    semana: document.getElementById("menu-semana")
+    semana: document.getElementById("menu-semana"),
+    perfil: document.getElementById("menu-perfil")
   };
   const menusMob = {
     treino: document.getElementById("menu-treino-mob"),
     exercicios: document.getElementById("menu-exercicios-mob"),
     progresso: document.getElementById("menu-progresso-mob"),
-    semana: document.getElementById("menu-semana-mob")
+    semana: document.getElementById("menu-semana-mob"),
+    perfil: document.getElementById("menu-perfil-mob")
   };
 
   Object.values(abas).forEach(el => el.classList.add("escondido"));
@@ -253,46 +258,17 @@ async function trocarAba(nome) {
     abas.semana.classList.remove("escondido");
     menus.semana.classList.add("ativo");
     menusMob.semana.classList.add("ativo");
+  } else if (nome === "perfil") {
+    abas.perfil.classList.remove("escondido");
+    menus.perfil.classList.add("ativo");
+    menusMob.perfil.classList.add("ativo");
+    await carregarPerfil();
   }
 
   document.getElementById("menu-mobile").classList.add("escondido");
   document.getElementById("dropdown-peso").classList.remove("aberto");
   document.getElementById("submenu-peso-mob").classList.remove("aberto");
 }
-
-document.getElementById("menu-treino").onclick = () => trocarAba("treino");
-document.getElementById("menu-semana").onclick = () => trocarAba("semana");
-document.getElementById("menu-exercicios").onclick = () => trocarAba("exercicios");
-document.getElementById("menu-progresso").onclick = () => trocarAba("progresso");
-document.getElementById("menu-treino-mob").onclick = () => trocarAba("treino");
-document.getElementById("menu-semana-mob").onclick = () => trocarAba("semana");
-document.getElementById("menu-exercicios-mob").onclick = () => trocarAba("exercicios");
-document.getElementById("menu-progresso-mob").onclick = () => trocarAba("progresso");
-
-// ====== DROPDOWN MEU PESO (desktop) ======
-document.getElementById("menu-peso").onclick = (e) => {
-  e.stopPropagation();
-  document.getElementById("dropdown-peso").classList.toggle("aberto");
-};
-
-document.getElementById("dropdown-peso").onclick = (e) => {
-  e.stopPropagation();
-};
-
-document.addEventListener("click", () => {
-  document.getElementById("dropdown-peso").classList.remove("aberto");
-});
-
-document.getElementById("btn-add-peso").onclick = () => {
-  document.getElementById("dropdown-peso").classList.remove("aberto");
-  trocarAba("addPeso");
-};
-
-document.getElementById("btn-historico").onclick = async () => {
-  document.getElementById("dropdown-peso").classList.remove("aberto");
-  await carregarHistorico();
-  trocarAba("historico");
-};
 
 // ====== DROPDOWN MEU PESO (mobile) ======
 document.getElementById("menu-peso-mob").onclick = () => {
@@ -498,6 +474,131 @@ async function carregarProgresso(musculo) {
     `;
     listaProgresso.appendChild(li);
   });
+}
+
+// ====== ABA PERFIL ======
+async function carregarPerfil() {
+  if (!usuarioAtual) return;
+
+  // 1) Nome e data de criação
+  const { data: aluno } = await supabaseClient
+    .from("alunos")
+    .select("nome, created_at")
+    .eq("user_id", usuarioAtual.id)
+    .single();
+
+  document.getElementById("perfil-nome").textContent =
+    (aluno?.nome || usuarioAtual.email.split("@")[0]).toUpperCase();
+
+  // 2) Membro desde
+  if (aluno?.created_at) {
+    const d = new Date(aluno.created_at);
+    const dia = String(d.getDate()).padStart(2, "0");
+    const mes = String(d.getMonth() + 1).padStart(2, "0");
+    const ano = d.getFullYear();
+    document.getElementById("perfil-membro").textContent = `${dia}/${mes}/${ano}`;
+  } else {
+    document.getElementById("perfil-membro").textContent = "—";
+  }
+
+  // 3) Treinos totais
+  const { count: treinosTotais } = await supabaseClient
+    .from("checkins")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", usuarioAtual.id)
+    .eq("treinou", true);
+
+  document.getElementById("perfil-treinos").textContent =
+    (treinosTotais || 0) + " " + (treinosTotais === 1 ? "TREINO" : "TREINOS");
+
+  // 4) Streak atual
+  const streakAtual = await calcularStreak(usuarioAtual.id);
+  document.getElementById("perfil-streak").textContent =
+    streakAtual + " " + (streakAtual === 1 ? "DIA" : "DIAS");
+
+  // 5) Melhor streak
+  const melhorStreak = await calcularMelhorStreak(usuarioAtual.id);
+  document.getElementById("perfil-melhor-streak").textContent =
+    melhorStreak + " " + (melhorStreak === 1 ? "DIA" : "DIAS");
+
+  // 6) Peso atual e diferença
+  const { data: pesos } = await supabaseClient
+    .from("pesos")
+    .select("peso, data")
+    .eq("user_id", usuarioAtual.id)
+    .order("data", { ascending: true });
+
+  if (pesos && pesos.length > 0) {
+    const pesoInicial = parseFloat(pesos[0].peso);
+    const pesoAtual = parseFloat(pesos[pesos.length - 1].peso);
+    const diff = pesoAtual - pesoInicial;
+
+    document.getElementById("perfil-peso").textContent = pesoAtual + " KG";
+
+    const el = document.getElementById("perfil-diferenca");
+
+    if (Math.abs(diff) < 0.1) {
+      el.textContent = "SEM MUDANÇA";
+      el.style.color = "#888";
+    } else if (diff < 0) {
+      el.textContent = `${diff.toFixed(1)} KG (PERDEU)`;
+      el.style.color = "#4ade80";
+    } else {
+      el.textContent = `+${diff.toFixed(1)} KG (GANHOU)`;
+      el.style.color = "#ff4b36";
+    }
+  } else {
+    document.getElementById("perfil-peso").textContent = "—";
+    document.getElementById("perfil-diferenca").textContent = "—";
+  }
+}
+
+// ====== MELHOR STREAK (maior sequência histórica de dias úteis) ======
+async function calcularMelhorStreak(userId) {
+  const { data: checkins, error } = await supabaseClient
+    .from("checkins")
+    .select("data, treinou")
+    .eq("user_id", userId)
+    .order("data", { ascending: true })
+    .limit(400);
+
+  if (error || !checkins || checkins.length === 0) return 0;
+
+  function ehDiaUtil(dataStr) {
+    const dow = new Date(dataStr + "T00:00:00").getDay();
+    return dow >= 1 && dow <= 5;
+  }
+
+  function diaUtilAnterior(dataStr) {
+    const d = new Date(dataStr + "T00:00:00");
+    do {
+      d.setDate(d.getDate() - 1);
+    } while (d.getDay() === 0 || d.getDay() === 6);
+    return d.toISOString().split("T")[0];
+  }
+
+  // Pega só os dias úteis com treinou=true, ordenados
+  const diasTreinados = checkins
+    .filter(c => c.treinou && ehDiaUtil(c.data))
+    .map(c => c.data)
+    .sort();
+
+  if (diasTreinados.length === 0) return 0;
+
+  let melhor = 1;
+  let atual = 1;
+
+  for (let i = 1; i < diasTreinados.length; i++) {
+    const anteriorEsperado = diaUtilAnterior(diasTreinados[i]);
+    if (anteriorEsperado === diasTreinados[i - 1]) {
+      atual++;
+      if (atual > melhor) melhor = atual;
+    } else {
+      atual = 1;
+    }
+  }
+
+  return melhor;
 }
 
 async function salvarCarga() {

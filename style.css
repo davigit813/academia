@@ -1270,6 +1270,56 @@ input:focus { outline: none; border-color: #e30613; }
   background: rgba(227, 6, 19, 0.15);
 }
 
+/* ==================== ABA PERFIL ==================== */
+.perfil-nome {
+  font-family: 'Anton', sans-serif;
+  font-size: 26px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #e30613;
+  text-align: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #1a1a1a;
+}
+
+.perfil-stats {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.perfil-stats li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  margin-bottom: 8px;
+  background: #1a1a1a;
+  border-radius: 8px;
+  border-left: 3px solid #e30613;
+}
+
+.perfil-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.perfil-valor {
+  font-family: 'Anton', sans-serif;
+  font-size: 17px;
+  letter-spacing: 0.5px;
+  color: #fff;
+  text-transform: uppercase;
+  text-align: right;
+  white-space: nowrap;
+}
+
 /* ==================== RESPONSIVO ==================== */
 @media (max-width: 720px) {
   .header-menu { display: none; }
@@ -1309,5 +1359,17 @@ input:focus { outline: none; border-color: #e30613; }
   .progresso-input-box input#input-carga {
     flex: 1;
     width: 100%;
+  }
+
+  .perfil-nome {
+    font-size: 22px;
+  }
+
+  .perfil-valor {
+    font-size: 15px;
+  }
+
+  .perfil-stats li {
+    padding: 14px 14px;
   }
 }
