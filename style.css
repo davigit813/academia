@@ -2012,3 +2012,167 @@ body { background: #000; }
 .filtro-btn { border-color: rgba(255, 255, 255, 0.20); }
 
 .grafico-scroll::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.4); }
+
+
+/* ==================== DROPDOWN "MEU PESO" (efeito morph) ==================== */
+/* O botão fechado se expande num cartão com os itens. Desktop + mobile. */
+
+.com-seta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.com-seta .seta {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  transition: transform 0.35s var(--ease-spring);
+}
+
+/* ---------- Desktop ---------- */
+.peso-ghost { visibility: hidden; pointer-events: none; }
+
+.peso-morph {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  width: var(--w0, 150px);
+  overflow: hidden;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px transparent, 0 0 0 rgba(0, 0, 0, 0);
+  transition:
+    width 0.4s var(--ease-spring),
+    border-radius 0.3s var(--ease-out),
+    background-color 0.25s ease,
+    box-shadow 0.3s ease;
+}
+
+.peso-morph #menu-peso {
+  width: 100%;
+  border-radius: 999px;
+}
+
+.peso-morph.peso-ativo:not(.aberto) { background: #e30613; }
+.peso-morph.peso-ativo:not(.aberto) #menu-peso { color: #fff; }
+
+.peso-morph.aberto {
+  width: 224px;
+  border-radius: 16px;
+  background: rgba(12, 0, 3, 0.94);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 20px 50px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(227, 6, 19, 0.18);
+}
+
+.peso-morph.aberto #menu-peso {
+  color: #fff;
+  background: transparent;
+  border-radius: 16px 16px 0 0;
+}
+.peso-morph.aberto #menu-peso .seta { transform: rotate(180deg); }
+
+/* Painel que abre pra baixo (altura animada sem saber o tamanho) */
+.peso-painel {
+  display: grid;
+  grid-template-rows: 0fr;
+  border-top: 1px solid transparent;
+  transition: grid-template-rows 0.35s var(--ease-out), border-color 0.3s ease;
+}
+.peso-morph.aberto .peso-painel {
+  grid-template-rows: 1fr;
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.peso-lista { overflow: hidden; min-height: 0; }
+
+.peso-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+}
+
+/* ---------- Itens (desktop e mobile) ---------- */
+.peso-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: #ccc;
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s, background-color 0.2s, box-shadow 0.2s, opacity 0.3s, transform 0.3s var(--ease-out);
+}
+.peso-item > span { flex: 1; }
+.peso-item .ico { width: 16px; height: 16px; flex-shrink: 0; }
+
+.peso-item .check {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: #ff4d5a;
+  opacity: 0;
+  transform: scale(0);
+  transition: transform 0.4s var(--ease-spring), opacity 0.2s;
+}
+
+.peso-item:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+
+.peso-item.ativo,
+.peso-item.ativo:hover {
+  color: #fff;
+  background: rgba(227, 6, 19, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(227, 6, 19, 0.40);
+}
+.peso-item.ativo .check { opacity: 1; transform: scale(1); }
+
+/* Itens entram um depois do outro */
+.peso-morph .peso-item,
+.submenu-mob .peso-item {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+.peso-morph.aberto .peso-item,
+.submenu-mob.aberto .peso-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+.peso-morph.aberto .peso-item:nth-child(1),
+.submenu-mob.aberto .peso-item:nth-child(1) { transition-delay: 0s, 0s, 0s, 0.10s, 0.10s; }
+.peso-morph.aberto .peso-item:nth-child(2),
+.submenu-mob.aberto .peso-item:nth-child(2) { transition-delay: 0s, 0s, 0s, 0.16s, 0.16s; }
+
+/* ---------- Mobile (menu do hambúrguer) ---------- */
+.menu-item-mob.com-seta { display: flex; width: 100%; }
+.menu-item-mob.aberto .seta { transform: rotate(180deg); }
+.menu-item-mob.aberto { color: #fff; }
+
+.submenu-mob { margin-left: 8px; margin-right: 8px; }
+.submenu-mob .peso-item {
+  margin-top: 4px;
+  padding: 13px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.submenu-mob .peso-item.ativo,
+.submenu-mob .peso-item.ativo:hover {
+  background: rgba(227, 6, 19, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(227, 6, 19, 0.40);
+}

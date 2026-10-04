@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="auth.css">
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
@@ -98,10 +97,19 @@
         <nav class="header-menu">
           <button id="menu-treino" class="menu-item ativo">TREINO</button>
           <div class="menu-dropdown-wrapper">
-            <button id="menu-peso" class="menu-item">MEU PESO ▾</button>
-            <div id="dropdown-peso" class="dropdown-peso">
-              <button id="btn-add-peso" class="dropdown-item">ADICIONAR PESO</button>
-              <button id="btn-historico" class="dropdown-item">HISTÓRICO</button>
+            <!-- fantasma: só reserva o espaço do botão fechado -->
+            <span id="peso-ghost" class="menu-item com-seta peso-ghost" aria-hidden="true"><span>MEU PESO</span><svg class="seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
+
+            <div id="dropdown-peso" class="peso-morph">
+              <button id="menu-peso" class="menu-item com-seta" type="button"><span>MEU PESO</span><svg class="seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+              <div class="peso-painel">
+                <div class="peso-lista">
+                  <div class="peso-inner">
+                    <button id="btn-add-peso" class="peso-item" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg><span>ADICIONAR PESO</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+                    <button id="btn-historico" class="peso-item" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg><span>HISTÓRICO</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <button id="menu-exercicios" class="menu-item">EXERCÍCIOS</button>
@@ -116,10 +124,10 @@
 
       <nav id="menu-mobile" class="menu-mobile escondido">
         <button id="menu-treino-mob" class="menu-item-mob">TREINO</button>
-        <button id="menu-peso-mob" class="menu-item-mob">MEU PESO ▾</button>
+        <button id="menu-peso-mob" class="menu-item-mob com-seta" type="button"><span>MEU PESO</span><svg class="seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
         <div id="submenu-peso-mob" class="submenu-mob">
-          <button id="btn-add-peso-mob" class="submenu-item">ADICIONAR PESO</button>
-          <button id="btn-historico-mob" class="submenu-item">HISTÓRICO</button>
+          <button id="btn-add-peso-mob" class="peso-item" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg><span>ADICIONAR PESO</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+          <button id="btn-historico-mob" class="peso-item" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg><span>HISTÓRICO</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
         </div>
         <button id="menu-exercicios-mob" class="menu-item-mob">EXERCÍCIOS</button>
         <button id="menu-progresso-mob" class="menu-item-mob">PROGRESSO</button>

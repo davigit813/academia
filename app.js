@@ -6,11 +6,11 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ====== TABELA DE TREINOS ======
 const TREINOS = {
-  1: "Peito, ombro e tríceps",
-  2: "Costas, ombro e bíceps",
+  1: "Peito, ombro e bíceps",
+  2: "Costas, ombro e tríceps",
   3: "Perna",
-  4: "Peito, ombro e tríceps",
-  5: "Costas, ombro e bíceps",
+  4: "Peito, ombro e bíceps",
+  5: "Costas, ombro e tríceps",
   6: "Descanso",
   0: "Descanso"
 };
@@ -202,12 +202,18 @@ async function entrarNoApp(user) {
 // ====== TROCA DE ABAS ======
 // ====== TROCA DE ABAS ======
 async function trocarAba(nome) {
-  document.querySelectorAll(".submenu-item").forEach(el => el.classList.remove("ativo"));
+  // Item atual do MEU PESO fica marcado (desktop e mobile)
+  document.querySelectorAll(".peso-item").forEach(el => el.classList.remove("ativo"));
+  const ehPeso = nome === "addPeso" || nome === "historico";
   if (nome === "addPeso") {
+    document.getElementById("btn-add-peso")?.classList.add("ativo");
     document.getElementById("btn-add-peso-mob")?.classList.add("ativo");
   } else if (nome === "historico") {
+    document.getElementById("btn-historico")?.classList.add("ativo");
     document.getElementById("btn-historico-mob")?.classList.add("ativo");
   }
+  document.getElementById("dropdown-peso")?.classList.toggle("peso-ativo", ehPeso);
+  document.getElementById("menu-peso-mob")?.classList.toggle("ativo", ehPeso);
 
   const abas = {
     treino: document.getElementById("aba-treino"),
@@ -267,6 +273,7 @@ async function trocarAba(nome) {
   document.getElementById("menu-mobile").classList.add("escondido");
   document.getElementById("dropdown-peso").classList.remove("aberto");
   document.getElementById("submenu-peso-mob").classList.remove("aberto");
+  document.getElementById("menu-peso-mob").classList.remove("aberto");
 }
 
 // ====== EVENTOS DOS MENUS ======
@@ -286,6 +293,28 @@ document.getElementById("menu-peso").onclick = () => {
   document.getElementById("dropdown-peso").classList.toggle("aberto");
 };
 
+// Mede o botão fechado: o dropdown "cresce" a partir dessa largura
+function medirBotaoPeso() {
+  const ghost = document.getElementById("peso-ghost");
+  const caixa = document.getElementById("dropdown-peso");
+  if (ghost && caixa && ghost.offsetWidth) {
+    caixa.style.setProperty("--w0", ghost.offsetWidth + "px");
+  }
+}
+document.getElementById("menu-peso").addEventListener("pointerdown", medirBotaoPeso);
+document.getElementById("menu-peso").addEventListener("focus", medirBotaoPeso);
+window.addEventListener("resize", medirBotaoPeso);
+
+// Fecha o dropdown ao clicar fora ou apertar Esc
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#dropdown-peso")) {
+    document.getElementById("dropdown-peso").classList.remove("aberto");
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") document.getElementById("dropdown-peso").classList.remove("aberto");
+});
+
 document.getElementById("btn-add-peso").onclick = () => {
   trocarAba("addPeso");
 };
@@ -297,7 +326,8 @@ document.getElementById("btn-historico").onclick = async () => {
 
 // ====== DROPDOWN MEU PESO (mobile) ======
 document.getElementById("menu-peso-mob").onclick = () => {
-  document.getElementById("submenu-peso-mob").classList.toggle("aberto");
+  const aberto = document.getElementById("submenu-peso-mob").classList.toggle("aberto");
+  document.getElementById("menu-peso-mob").classList.toggle("aberto", aberto);
 };
 
 document.getElementById("btn-add-peso-mob").onclick = () => {
