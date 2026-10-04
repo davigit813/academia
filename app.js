@@ -4,6 +4,14 @@ const SUPABASE_KEY = "sb_publishable_7K-Y-m8hWqJc_Lctm0ukWw_M5AreP-B";
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ====== LOG DE EVENTOS (Discord) ======
+// Não bloqueia o fluxo do usuário. Se falhar, ignora.
+function logEvento(tipo, dados = {}) {
+  supabaseClient.functions
+    .invoke("log-evento", { body: { tipo, ...dados } })
+    .catch(() => {});
+}
+
 // ====== TABELA DE TREINOS ======
 const TREINOS = {
   1: "Peito, ombro e bíceps",
@@ -135,6 +143,7 @@ form.onsubmit = async (e) => {
 
       msg.className = "msg sucesso";
       msg.textContent = "CONTA CRIADA! ENTRANDO...";
+      logEvento("cadastro_ok", { email, nome });
       await entrarNoApp(usuarioAtual);
 
     } else {
@@ -149,9 +158,16 @@ form.onsubmit = async (e) => {
       usuarioAtual = data.user;
 
       await entrarNoApp(usuarioAtual);
+      logEvento("login_ok", { email });
     }
 
   } catch (err) {
+    if (modo === "login") {
+      logEvento("login_falhou", { email, detalhe: err.message });
+    }
+    if (modo === "cadastro" && err.message.includes("already registered")) {
+      logEvento("cadastro_duplicado", { email });
+    }
     msg.className = "msg erro";
     msg.textContent = traduzErro(err.message);
   } finally {
@@ -430,12 +446,14 @@ async function salvarPeso() {
   btnSalvarPeso.disabled = false;
 
   if (error) {
+    logEvento("erro_supabase", { detalhe: `pesos: ${error.message}`, user_id: usuarioAtual.id });
     msgPeso.textContent = "ERRO: " + error.message;
     msgPeso.className = "msg erro";
     return;
   }
 
   msgPeso.textContent = "PESO SALVO! 💪";
+  logEvento("peso_salvo", { nome: valor + " kg", user_id: usuarioAtual.id });
   msgPeso.className = "msg sucesso";
   inputPeso.value = "";
 }
@@ -709,6 +727,11 @@ async function salvarCarga() {
   }
 
   msgProgresso.textContent = "CARGA SALVA! 💪";
+  logEvento("carga_salva", {
+    nome: nome,
+    detalhe: `${peso} kg (${musculoProgressoAtivo})`,
+    user_id: usuarioAtual.id,
+  });
   msgProgresso.className = "msg sucesso";
 
   inputNomeExercicio.value = "";
@@ -935,6 +958,10 @@ async function salvarCheckin(treinou) {
 
   await atualizarResumoOntem(usuarioAtual.id);
   await atualizarStreak(usuarioAtual.id);
+  logEvento("checkin", {
+    nome: treinou ? "Treinou" : "Faltou",
+    user_id: usuarioAtual.id,
+  });
 }
 
 document.getElementById("btn-treinei").onclick = () => salvarCheckin(true);
@@ -1436,6 +1463,7 @@ async function carregarIndice() {
     loading.classList.add("escondido");
     return indiceExercicios;
   } catch (err) {
+    logEvento("erro_fetch", { detalhe: `indice.json: ${err.message}` });
     loading.classList.add("escondido");
     document.getElementById("sem-exercicios").textContent =
       "ERRO AO CARREGAR OS EXERCÍCIOS: " + err.message;
