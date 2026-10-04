@@ -118,15 +118,17 @@
           <button id="menu-perfil" class="menu-item">PERFIL</button>
         </nav>
 
-        <button id="btn-avatar" class="btn-avatar" type="button" title="Trocar foto" aria-label="Trocar foto de perfil">
-          <span class="avatar-circulo">
-            <img id="avatar-img" class="avatar-img" alt="Sua foto">
-            <svg class="avatar-boneco" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg>
-          </span>
-          <span class="avatar-lapis" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
-          </span>
-        </button>
+        <div class="avatar-wrap">
+          <button id="btn-avatar" class="btn-avatar" type="button" title="Ver foto" aria-label="Ver foto de perfil">
+            <span class="avatar-circulo">
+              <img id="avatar-img" class="avatar-img" alt="Sua foto">
+              <svg class="avatar-boneco" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg>
+            </span>
+          </button>
+          <button id="btn-avatar-editar" class="avatar-lapis" type="button" title="Trocar foto" aria-label="Trocar foto de perfil">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+          </button>
+        </div>
         <input type="file" id="input-avatar" accept="image/*" hidden>
 
         <button id="btn-sair" class="btn-sair-topo">SAIR</button>
@@ -243,9 +245,16 @@
 
            <!-- ABA: PERFIL -->
       <section id="aba-perfil" class="aba-conteudo escondido">
-        <h2 class="titulo-secao">PERFIL</h2>
-
-        <div class="perfil-nome" id="perfil-nome">—</div>
+        <div class="perfil-topo">
+          <button id="perfil-foto-btn" class="perfil-foto" type="button" aria-label="Ver foto de perfil">
+            <img id="perfil-foto-img" alt="Sua foto">
+            <svg class="avatar-boneco" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg>
+          </button>
+          <div class="perfil-topo-texto">
+            <h2 class="titulo-secao">PERFIL</h2>
+            <div class="perfil-nome" id="perfil-nome">—</div>
+          </div>
+        </div>
 
         <!-- Destaque: Streak atual -->
         <div class="perfil-destaque">
@@ -291,6 +300,19 @@
             <span class="card-valor" id="perfil-diferenca">—</span>
           </div>
         </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- VISUALIZADOR DE FOTO -->
+  <div id="foto-modal" class="foto-modal escondido" role="dialog" aria-modal="true" aria-label="Foto de perfil">
+    <button id="foto-fechar" class="foto-fechar" type="button" aria-label="Fechar">✕</button>
+    <div class="foto-modal-card">
+      <div class="foto-grande"><img id="foto-grande-img" alt="Sua foto"></div>
+      <button id="foto-trocar" class="foto-trocar" type="button">TROCAR FOTO</button>
+    </div>
+  </div>
 
     <!-- AVISO DE ATUALIZAÇÃO (PWA) -->
   <div id="update-banner" class="update-banner">

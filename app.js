@@ -973,22 +973,23 @@ const fotoGrandeImg = document.getElementById("foto-grande-img");
 
 function mostrarAvatar(src) {
   [avatarImg, perfilFotoImg, fotoGrandeImg].forEach(img => {
+    if (!img) return;
     if (src) img.src = src;
     else img.removeAttribute("src");
   });
-  [btnAvatar, perfilFotoBtn].forEach(b => b.classList.toggle("tem-foto", !!src));
+  [btnAvatar, perfilFotoBtn].forEach(b => b?.classList.toggle("tem-foto", !!src));
 }
 
 function temFoto() {
-  return btnAvatar.classList.contains("tem-foto");
+  return !!btnAvatar?.classList.contains("tem-foto");
 }
 
 function abrirModalFoto() {
-  fotoModal.classList.remove("escondido");
+  fotoModal?.classList.remove("escondido");
 }
 
 function fecharModalFoto() {
-  fotoModal.classList.add("escondido");
+  fotoModal?.classList.add("escondido");
 }
 
 // Corta a foto em quadrado e diminui pra 512px (fica leve e rápida)
@@ -1036,26 +1037,29 @@ async function carregarAvatar(user) {
 // Com foto: abre a foto grande. Sem foto: já abre a escolha da imagem.
 function abrirFotoOuEscolher() {
   if (temFoto()) abrirModalFoto();
-  else inputAvatar.click();
+  else inputAvatar?.click();
 }
 
-btnAvatar.onclick = abrirFotoOuEscolher;
-perfilFotoBtn.onclick = abrirFotoOuEscolher;
-btnAvatarEditar.onclick = () => inputAvatar.click();
+// (cada ligação é protegida: se algum elemento faltar no index.html, o resto do site continua funcionando)
+const ligarClique = (el, fn) => { if (el) el.onclick = fn; };
 
-document.getElementById("foto-trocar").onclick = () => {
+ligarClique(btnAvatar, abrirFotoOuEscolher);
+ligarClique(perfilFotoBtn, abrirFotoOuEscolher);
+ligarClique(btnAvatarEditar, () => inputAvatar?.click());
+
+ligarClique(document.getElementById("foto-trocar"), () => {
   fecharModalFoto();
-  inputAvatar.click();
-};
-document.getElementById("foto-fechar").onclick = fecharModalFoto;
-fotoModal.addEventListener("click", (e) => {
+  inputAvatar?.click();
+});
+ligarClique(document.getElementById("foto-fechar"), fecharModalFoto);
+fotoModal?.addEventListener("click", (e) => {
   if (e.target === fotoModal) fecharModalFoto();
 });
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") fecharModalFoto();
 });
 
-inputAvatar.onchange = async () => {
+if (inputAvatar) inputAvatar.onchange = async () => {
   const arquivo = inputAvatar.files[0];
   inputAvatar.value = "";
   if (!arquivo || !usuarioAtual) return;

@@ -1,5 +1,5 @@
 // Troque este número a cada vez que publicar uma mudança (v10 -> v11 -> v12...)
-const CACHE = "academia-v14";
+const CACHE = "academia-v15";
 
 const ARQUIVOS = [
   "/",
