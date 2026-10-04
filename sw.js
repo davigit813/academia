@@ -1,80 +1,61 @@
-// Nome do cache (muda a versão pra forçar atualização)
-const CACHE_NAME = "academia-v9";
+// Troque este número a cada vez que publicar uma mudança (v10 -> v11 -> v12...)
+const CACHE = "academia-v10";
 
-// Arquivos que vão ficar em cache (pra funcionar offline)
-const ARQUIVOS_CACHE = [
+const ARQUIVOS = [
   "/",
   "/index.html",
   "/style.css",
   "/app.js",
+  "/manifest.json",
   "/logo.png",
   "/logosite.png",
-  "/manifest.json"
+  "/icones/icon-192.png"
 ];
 
-// ====== INSTALAÇÃO: guarda os arquivos em cache ======
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ARQUIVOS_CACHE);
-    })
+// Instala e já guarda os arquivos principais
+self.addEventListener("install", (e) => {
+  e.waitUntil(
+    caches.open(CACHE)
+      .then((c) => c.addAll(ARQUIVOS))
+      .catch(() => {})
   );
   self.skipWaiting();
 });
 
-// ====== ATIVAÇÃO: limpa caches antigos ======
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((nomes) => {
-      return Promise.all(
-        nomes.map((nome) => {
-          if (nome !== CACHE_NAME) {
-            return caches.delete(nome);
-          }
-        })
-      );
-    })
+// Apaga caches antigos (academia-v9 etc.) e assume o controle
+self.addEventListener("activate", (e) => {
+  e.waitUntil(
+    caches.keys()
+      .then((nomes) => Promise.all(nomes.filter((n) => n !== CACHE).map((n) => caches.delete(n))))
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-// ====== FETCH: serve do cache, senão busca da rede ======
-self.addEventListener("fetch", (event) => {
-  const url = event.request.url;
+// Botão "Atualizar" do aviso de nova versão
+self.addEventListener("message", (e) => {
+  if (e.data && e.data.type === "SKIP_WAITING") self.skipWaiting();
+});
 
-  // Não intercepta requisições pro Supabase, Google Fonts e CDN
-  if (
-    url.includes("supabase.co") ||
-    url.includes("fonts.googleapis.com") ||
-    url.includes("fonts.gstatic.com") ||
-    url.includes("cdn.jsdelivr.net")
-  ) {
-    return;
-  }
+// Sempre tenta a internet primeiro (pega a versão nova);
+// só usa o cache se estiver sem conexão.
+self.addEventListener("fetch", (e) => {
+  const req = e.request;
+  if (req.method !== "GET") return;
 
-  event.respondWith(
-    caches.match(event.request).then((resposta) => {
-      if (resposta) return resposta;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return; // Supabase e CDN passam direto
 
-      return fetch(event.request).then((respostaRede) => {
-        if (!respostaRede || respostaRede.status !== 200) {
-          return respostaRede;
+  e.respondWith(
+    fetch(req, { cache: "no-cache" })
+      .then((res) => {
+        if (res.ok && ARQUIVOS.includes(url.pathname)) {
+          const copia = res.clone();
+          caches.open(CACHE).then((c) => c.put(req, copia));
         }
-
-        const respostaClone = respostaRede.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, respostaClone);
-        });
-
-        return respostaRede;
-      });
-    })
+        return res;
+      })
+      .catch(() =>
+        caches.match(req).then((r) => r || caches.match("/index.html"))
+      )
   );
-});
-
-// ====== RESPONDE AO PEDIDO DE SKIP_WAITING (vindo do frontend) ======
-self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
 });
