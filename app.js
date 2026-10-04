@@ -963,20 +963,35 @@ btnSeta.onclick = async () => {
 
 // ====== AVATAR (foto de perfil) ======
 const btnAvatar = document.getElementById("btn-avatar");
+const btnAvatarEditar = document.getElementById("btn-avatar-editar");
 const inputAvatar = document.getElementById("input-avatar");
 const avatarImg = document.getElementById("avatar-img");
+const perfilFotoBtn = document.getElementById("perfil-foto-btn");
+const perfilFotoImg = document.getElementById("perfil-foto-img");
+const fotoModal = document.getElementById("foto-modal");
+const fotoGrandeImg = document.getElementById("foto-grande-img");
 
 function mostrarAvatar(src) {
-  if (src) {
-    avatarImg.src = src;
-    btnAvatar.classList.add("tem-foto");
-  } else {
-    avatarImg.removeAttribute("src");
-    btnAvatar.classList.remove("tem-foto");
-  }
+  [avatarImg, perfilFotoImg, fotoGrandeImg].forEach(img => {
+    if (src) img.src = src;
+    else img.removeAttribute("src");
+  });
+  [btnAvatar, perfilFotoBtn].forEach(b => b.classList.toggle("tem-foto", !!src));
 }
 
-// Corta a foto em quadrado e diminui pra 256px (fica leve e rápida)
+function temFoto() {
+  return btnAvatar.classList.contains("tem-foto");
+}
+
+function abrirModalFoto() {
+  fotoModal.classList.remove("escondido");
+}
+
+function fecharModalFoto() {
+  fotoModal.classList.add("escondido");
+}
+
+// Corta a foto em quadrado e diminui pra 512px (fica leve e rápida)
 function redimensionarFoto(arquivo, tamanho) {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(arquivo);
@@ -1018,7 +1033,27 @@ async function carregarAvatar(user) {
   } catch (_) {}
 }
 
-btnAvatar.onclick = () => inputAvatar.click();
+// Com foto: abre a foto grande. Sem foto: já abre a escolha da imagem.
+function abrirFotoOuEscolher() {
+  if (temFoto()) abrirModalFoto();
+  else inputAvatar.click();
+}
+
+btnAvatar.onclick = abrirFotoOuEscolher;
+perfilFotoBtn.onclick = abrirFotoOuEscolher;
+btnAvatarEditar.onclick = () => inputAvatar.click();
+
+document.getElementById("foto-trocar").onclick = () => {
+  fecharModalFoto();
+  inputAvatar.click();
+};
+document.getElementById("foto-fechar").onclick = fecharModalFoto;
+fotoModal.addEventListener("click", (e) => {
+  if (e.target === fotoModal) fecharModalFoto();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") fecharModalFoto();
+});
 
 inputAvatar.onchange = async () => {
   const arquivo = inputAvatar.files[0];
@@ -1031,7 +1066,7 @@ inputAvatar.onchange = async () => {
   }
 
   try {
-    const foto = await redimensionarFoto(arquivo, 256);
+    const foto = await redimensionarFoto(arquivo, 512);
     mostrarAvatar(foto);
 
     try { localStorage.setItem("avatar_" + usuarioAtual.id, foto); } catch (_) {}
@@ -1053,6 +1088,7 @@ async function sair() {
   msg.textContent = "";
   campoNome.style.display = "none";
   document.getElementById("menu-mobile").classList.add("escondido");
+  fecharModalFoto();
   mostrarAvatar(null);
 }
 
