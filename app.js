@@ -175,6 +175,8 @@ async function entrarNoApp(user) {
   document.getElementById("nome-user").textContent =
     (aluno?.nome || user.email.split("@")[0]).toUpperCase();
 
+  carregarAvatar(user);
+
   const hoje = new Date().getDay();
   document.getElementById("dia-semana").textContent = NOMES_DIAS[hoje];
   document.getElementById("treino-hoje").textContent = TREINOS[hoje];
@@ -959,6 +961,127 @@ btnSeta.onclick = async () => {
   await atualizarStreak(usuarioAtual.id);
 };
 
+// ====== AVATAR (foto de perfil) ======
+const btnAvatar = document.getElementById("btn-avatar");
+const btnAvatarEditar = document.getElementById("btn-avatar-editar");
+const inputAvatar = document.getElementById("input-avatar");
+const avatarImg = document.getElementById("avatar-img");
+const perfilFotoBtn = document.getElementById("perfil-foto-btn");
+const perfilFotoImg = document.getElementById("perfil-foto-img");
+const fotoModal = document.getElementById("foto-modal");
+const fotoGrandeImg = document.getElementById("foto-grande-img");
+
+function mostrarAvatar(src) {
+  [avatarImg, perfilFotoImg, fotoGrandeImg].forEach(img => {
+    if (!img) return;
+    if (src) img.src = src;
+    else img.removeAttribute("src");
+  });
+  [btnAvatar, perfilFotoBtn].forEach(b => b?.classList.toggle("tem-foto", !!src));
+}
+
+function temFoto() {
+  return !!btnAvatar?.classList.contains("tem-foto");
+}
+
+function abrirModalFoto() {
+  fotoModal?.classList.remove("escondido");
+}
+
+function fecharModalFoto() {
+  fotoModal?.classList.add("escondido");
+}
+
+// Corta a foto em quadrado e diminui pra 512px (fica leve e rápida)
+function redimensionarFoto(arquivo, tamanho) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(arquivo);
+    const img = new Image();
+    img.onload = () => {
+      const lado = Math.min(img.width, img.height);
+      const sx = (img.width - lado) / 2;
+      const sy = (img.height - lado) / 2;
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = tamanho;
+      canvas.getContext("2d").drawImage(img, sx, sy, lado, lado, 0, 0, tamanho, tamanho);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL("image/jpeg", 0.85));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("imagem inválida"));
+    };
+    img.src = url;
+  });
+}
+
+async function carregarAvatar(user) {
+  let salva = null;
+  try { salva = localStorage.getItem("avatar_" + user.id); } catch (_) {}
+  mostrarAvatar(salva);
+
+  // Se existir a coluna "avatar" no Supabase, a foto de lá vale em qualquer aparelho
+  try {
+    const { data, error } = await supabaseClient
+      .from("alunos")
+      .select("avatar")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (!error && data?.avatar) {
+      mostrarAvatar(data.avatar);
+      try { localStorage.setItem("avatar_" + user.id, data.avatar); } catch (_) {}
+    }
+  } catch (_) {}
+}
+
+// Com foto: abre a foto grande. Sem foto: já abre a escolha da imagem.
+function abrirFotoOuEscolher() {
+  if (temFoto()) abrirModalFoto();
+  else inputAvatar?.click();
+}
+
+// (cada ligação é protegida: se algum elemento faltar no index.html, o resto do site continua funcionando)
+const ligarClique = (el, fn) => { if (el) el.onclick = fn; };
+
+ligarClique(btnAvatar, abrirFotoOuEscolher);
+ligarClique(perfilFotoBtn, abrirFotoOuEscolher);
+ligarClique(btnAvatarEditar, () => inputAvatar?.click());
+
+ligarClique(document.getElementById("foto-trocar"), () => {
+  fecharModalFoto();
+  inputAvatar?.click();
+});
+ligarClique(document.getElementById("foto-fechar"), fecharModalFoto);
+fotoModal?.addEventListener("click", (e) => {
+  if (e.target === fotoModal) fecharModalFoto();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") fecharModalFoto();
+});
+
+if (inputAvatar) inputAvatar.onchange = async () => {
+  const arquivo = inputAvatar.files[0];
+  inputAvatar.value = "";
+  if (!arquivo || !usuarioAtual) return;
+
+  if (!arquivo.type.startsWith("image/")) {
+    alert("Escolha uma imagem.");
+    return;
+  }
+
+  try {
+    const foto = await redimensionarFoto(arquivo, 512);
+    mostrarAvatar(foto);
+
+    try { localStorage.setItem("avatar_" + usuarioAtual.id, foto); } catch (_) {}
+
+    // Tenta guardar no Supabase também (só funciona se a coluna "avatar" existir)
+    await supabaseClient.from("alunos").update({ avatar: foto }).eq("user_id", usuarioAtual.id);
+  } catch (_) {
+    alert("Não consegui usar essa foto. Tente outra.");
+  }
+};
+
 // ====== SAIR ======
 async function sair() {
   await supabaseClient.auth.signOut();
@@ -969,6 +1092,8 @@ async function sair() {
   msg.textContent = "";
   campoNome.style.display = "none";
   document.getElementById("menu-mobile").classList.add("escondido");
+  fecharModalFoto();
+  mostrarAvatar(null);
 }
 
 document.getElementById("btn-sair").onclick = sair;

@@ -1,5 +1,5 @@
 // Troque este número a cada vez que publicar uma mudança (v10 -> v11 -> v12...)
-const CACHE = "academia-v15";
+const CACHE = "academia-v11";
 
 const ARQUIVOS = [
   "/",
@@ -55,7 +55,7 @@ self.addEventListener("fetch", (e) => {
         return res;
       })
       .catch(() =>
-        caches.match(req).then((r) => r || caches.match("/index.html"))
+        caches.match(req, { ignoreSearch: true }).then((r) => r || caches.match("/index.html"))
       )
   );
 });
