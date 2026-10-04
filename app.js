@@ -175,6 +175,8 @@ async function entrarNoApp(user) {
   document.getElementById("nome-user").textContent =
     (aluno?.nome || user.email.split("@")[0]).toUpperCase();
 
+  carregarAvatar(user);
+
   const hoje = new Date().getDay();
   document.getElementById("dia-semana").textContent = NOMES_DIAS[hoje];
   document.getElementById("treino-hoje").textContent = TREINOS[hoje];
@@ -959,6 +961,88 @@ btnSeta.onclick = async () => {
   await atualizarStreak(usuarioAtual.id);
 };
 
+// ====== AVATAR (foto de perfil) ======
+const btnAvatar = document.getElementById("btn-avatar");
+const inputAvatar = document.getElementById("input-avatar");
+const avatarImg = document.getElementById("avatar-img");
+
+function mostrarAvatar(src) {
+  if (src) {
+    avatarImg.src = src;
+    btnAvatar.classList.add("tem-foto");
+  } else {
+    avatarImg.removeAttribute("src");
+    btnAvatar.classList.remove("tem-foto");
+  }
+}
+
+// Corta a foto em quadrado e diminui pra 256px (fica leve e rápida)
+function redimensionarFoto(arquivo, tamanho) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(arquivo);
+    const img = new Image();
+    img.onload = () => {
+      const lado = Math.min(img.width, img.height);
+      const sx = (img.width - lado) / 2;
+      const sy = (img.height - lado) / 2;
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = tamanho;
+      canvas.getContext("2d").drawImage(img, sx, sy, lado, lado, 0, 0, tamanho, tamanho);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL("image/jpeg", 0.85));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("imagem inválida"));
+    };
+    img.src = url;
+  });
+}
+
+async function carregarAvatar(user) {
+  let salva = null;
+  try { salva = localStorage.getItem("avatar_" + user.id); } catch (_) {}
+  mostrarAvatar(salva);
+
+  // Se existir a coluna "avatar" no Supabase, a foto de lá vale em qualquer aparelho
+  try {
+    const { data, error } = await supabaseClient
+      .from("alunos")
+      .select("avatar")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (!error && data?.avatar) {
+      mostrarAvatar(data.avatar);
+      try { localStorage.setItem("avatar_" + user.id, data.avatar); } catch (_) {}
+    }
+  } catch (_) {}
+}
+
+btnAvatar.onclick = () => inputAvatar.click();
+
+inputAvatar.onchange = async () => {
+  const arquivo = inputAvatar.files[0];
+  inputAvatar.value = "";
+  if (!arquivo || !usuarioAtual) return;
+
+  if (!arquivo.type.startsWith("image/")) {
+    alert("Escolha uma imagem.");
+    return;
+  }
+
+  try {
+    const foto = await redimensionarFoto(arquivo, 256);
+    mostrarAvatar(foto);
+
+    try { localStorage.setItem("avatar_" + usuarioAtual.id, foto); } catch (_) {}
+
+    // Tenta guardar no Supabase também (só funciona se a coluna "avatar" existir)
+    await supabaseClient.from("alunos").update({ avatar: foto }).eq("user_id", usuarioAtual.id);
+  } catch (_) {
+    alert("Não consegui usar essa foto. Tente outra.");
+  }
+};
+
 // ====== SAIR ======
 async function sair() {
   await supabaseClient.auth.signOut();
@@ -969,6 +1053,7 @@ async function sair() {
   msg.textContent = "";
   campoNome.style.display = "none";
   document.getElementById("menu-mobile").classList.add("escondido");
+  mostrarAvatar(null);
 }
 
 document.getElementById("btn-sair").onclick = sair;
