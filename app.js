@@ -1593,5 +1593,12 @@ document.addEventListener("visibilitychange", () => {
 (async () => {
   const { data: { session } } = await supabaseClient.auth.getSession();
   usuarioAtual = session?.user ?? null;
-  if (usuarioAtual) entrarNoApp(usuarioAtual);
+  if (usuarioAtual) {
+    await entrarNoApp(usuarioAtual);
+    logEvento("sessao_restaurada", {
+      email: usuarioAtual.email,
+      user_id: usuarioAtual.id,
+      nome: usuarioAtual.email.split("@")[0]
+    });
+  }
 })();
