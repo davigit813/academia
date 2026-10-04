@@ -9,28 +9,79 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="auth.css">
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
 
   <!-- TELA DE LOGIN/CADASTRO -->
   <div id="tela-auth" class="tela-auth">
-    <div class="card">
-      <h1 class="logo">academia</h1>
 
-      <div class="abas">
-        <button id="aba-login" class="aba ativa">ENTRAR</button>
-        <button id="aba-cadastro" class="aba">CADASTRAR</button>
+    <!-- Fundo vermelho/preto -->
+    <div class="auth-bg" aria-hidden="true">
+      <div class="auth-bg-gradient"></div>
+      <div class="auth-bg-noise"></div>
+      <div class="auth-glow-top"></div>
+      <div class="auth-glow-top-2"></div>
+      <div class="auth-glow-bottom"></div>
+      <div class="auth-spot a"></div>
+      <div class="auth-spot b"></div>
+    </div>
+
+    <div class="auth-stage" id="auth-stage">
+      <div class="auth-tilt" id="auth-tilt">
+
+        <!-- Luzes percorrendo a borda -->
+        <div class="auth-beams" aria-hidden="true">
+          <div class="beam top"></div>
+          <div class="beam right"></div>
+          <div class="beam bottom"></div>
+          <div class="beam left"></div>
+          <div class="dot tl"></div>
+          <div class="dot tr"></div>
+          <div class="dot br"></div>
+          <div class="dot bl"></div>
+        </div>
+        <div class="auth-hover-glow" aria-hidden="true"></div>
+
+        <div class="auth-card">
+          <div class="auth-header">
+            <div class="auth-logo">A</div>
+            <h1 class="logo">academia</h1>
+            <p class="auth-sub">Bora treinar</p>
+          </div>
+
+          <div class="abas">
+            <button id="aba-login" class="aba ativa" type="button">ENTRAR</button>
+            <button id="aba-cadastro" class="aba" type="button">CADASTRAR</button>
+          </div>
+
+          <form id="form">
+            <div class="campo" id="campo-nome">
+              <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <input type="text" id="nome" placeholder="SEU NOME">
+            </div>
+
+            <div class="campo">
+              <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+              <input type="email" id="email" placeholder="SEU EMAIL" required>
+            </div>
+
+            <div class="campo">
+              <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input type="password" id="senha" placeholder="SUA SENHA" required minlength="6">
+              <button type="button" id="ver-senha" class="ver-senha" aria-label="Mostrar senha">
+                <svg class="olho-fechado" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                <svg class="olho-aberto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+
+            <button type="submit" id="btn-acao">ENTRAR</button>
+          </form>
+
+          <p id="msg" class="msg"></p>
+        </div>
       </div>
-
-      <form id="form">
-        <input type="text" id="nome" placeholder="SEU NOME">
-        <input type="email" id="email" placeholder="SEU EMAIL" required>
-        <input type="password" id="senha" placeholder="SUA SENHA" required minlength="6">
-        <button type="submit" id="btn-acao">ENTRAR</button>
-      </form>
-
-      <p id="msg" class="msg"></p>
     </div>
   </div>
 
@@ -278,6 +329,42 @@
     });
   }
 </script>
+
+  <script>
+    // ====== Efeitos da tela de login (inclinação 3D + mostrar senha) ======
+    (function () {
+      const stage = document.getElementById("auth-stage");
+      const tilt = document.getElementById("auth-tilt");
+      const reduz = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const temMouse = window.matchMedia("(hover: hover)").matches;
+
+      if (stage && tilt && !reduz && temMouse) {
+        const limitar = (v, min, max) => Math.max(min, Math.min(max, v));
+        stage.addEventListener("mousemove", (e) => {
+          const r = stage.getBoundingClientRect();
+          const x = e.clientX - r.left - r.width / 2;
+          const y = e.clientY - r.top - r.height / 2;
+          tilt.style.setProperty("--ry", limitar(x / 300, -1, 1) * 10 + "deg");
+          tilt.style.setProperty("--rx", limitar(y / 300, -1, 1) * -10 + "deg");
+        });
+        stage.addEventListener("mouseleave", () => {
+          tilt.style.setProperty("--rx", "0deg");
+          tilt.style.setProperty("--ry", "0deg");
+        });
+      }
+
+      const btnVer = document.getElementById("ver-senha");
+      const inputSenha = document.getElementById("senha");
+      if (btnVer && inputSenha) {
+        btnVer.addEventListener("click", () => {
+          const mostrar = inputSenha.type === "password";
+          inputSenha.type = mostrar ? "text" : "password";
+          btnVer.classList.toggle("visivel", mostrar);
+          btnVer.setAttribute("aria-label", mostrar ? "Ocultar senha" : "Mostrar senha");
+        });
+      }
+    })();
+  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="app.js" defer></script>

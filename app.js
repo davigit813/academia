@@ -25,6 +25,7 @@ const telaAuth = document.getElementById("tela-auth");
 const telaApp = document.getElementById("tela-app");
 const form = document.getElementById("form");
 const nomeInput = document.getElementById("nome");
+const campoNome = document.getElementById("campo-nome");
 const emailInput = document.getElementById("email");
 const senhaInput = document.getElementById("senha");
 const btnAcao = document.getElementById("btn-acao");
@@ -58,7 +59,7 @@ supabaseClient.auth.onAuthStateChange((_event, session) => {
   usuarioAtual = session?.user ?? null;
 });
 
-nomeInput.style.display = "none";
+campoNome.style.display = "none";
 
 // ====== EFEITO RIPPLE NOS BOTÕES ======
 const prefereMenosMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -89,7 +90,7 @@ abaLogin.onclick = () => {
   abaCadastro.classList.remove("ativa");
   btnAcao.textContent = "ENTRAR";
   msg.textContent = "";
-  nomeInput.style.display = "none";
+  campoNome.style.display = "none";
 };
 
 abaCadastro.onclick = () => {
@@ -98,7 +99,7 @@ abaCadastro.onclick = () => {
   abaLogin.classList.remove("ativa");
   btnAcao.textContent = "CRIAR CONTA";
   msg.textContent = "";
-  nomeInput.style.display = "block";
+  campoNome.style.display = "block";
 };
 
 // ====== ENVIO DO FORMULÁRIO ======
@@ -936,7 +937,7 @@ async function sair() {
   telaAuth.classList.remove("escondido");
   form.reset();
   msg.textContent = "";
-  nomeInput.style.display = "none";
+  campoNome.style.display = "none";
   document.getElementById("menu-mobile").classList.add("escondido");
 }
 

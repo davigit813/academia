@@ -1515,3 +1515,500 @@ input:focus { outline: none; border-color: #e30613; }
     font-size: 18px;
   }
 }
+
+/* ==================== TELA AUTH — CARD 3D VERMELHO/PRETO ==================== */
+/* Carregar DEPOIS do style.css */
+
+.tela-auth {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: #000;
+}
+
+/* ---------- Fundo ---------- */
+.auth-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.auth-bg > * { position: absolute; }
+
+.auth-bg-gradient {
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(227, 6, 19, 0.40), rgba(130, 0, 10, 0.50) 50%, #000);
+}
+
+.auth-bg-noise {
+  inset: 0;
+  opacity: 0.03;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+.auth-glow-top {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120vh;
+  height: 60vh;
+  border-radius: 0 0 50% 50%;
+  background: rgba(255, 40, 55, 0.20);
+  filter: blur(80px);
+}
+
+.auth-glow-top-2 {
+  top: 0;
+  left: 50%;
+  width: 100vh;
+  height: 60vh;
+  border-radius: 0 0 999px 999px;
+  background: rgba(255, 90, 100, 0.20);
+  filter: blur(60px);
+  animation: auth-glow-a 8s ease-in-out infinite alternate;
+}
+
+.auth-glow-bottom {
+  bottom: 0;
+  left: 50%;
+  width: 90vh;
+  height: 90vh;
+  border-radius: 999px 999px 0 0;
+  background: rgba(255, 40, 55, 0.20);
+  filter: blur(60px);
+  animation: auth-glow-b 6s ease-in-out 1s infinite alternate;
+}
+
+.auth-spot {
+  width: 384px;
+  height: 384px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  filter: blur(100px);
+  opacity: 0.4;
+  animation: auth-pulse 2s ease-in-out infinite;
+}
+.auth-spot.a { left: 25%; top: 25%; }
+.auth-spot.b { right: 25%; bottom: 25%; animation-delay: 1s; }
+
+@keyframes auth-glow-a {
+  from { opacity: 0.15; transform: translateX(-50%) scale(0.98); }
+  to   { opacity: 0.30; transform: translateX(-50%) scale(1.02); }
+}
+@keyframes auth-glow-b {
+  from { opacity: 0.30; transform: translateX(-50%) scale(1); }
+  to   { opacity: 0.50; transform: translateX(-50%) scale(1.1); }
+}
+@keyframes auth-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.15; }
+}
+
+/* ---------- Palco 3D ---------- */
+.auth-stage {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  perspective: 1500px;
+  animation: auth-entrada 0.8s var(--ease-out) both;
+}
+
+@keyframes auth-entrada {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.auth-tilt {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.18s ease-out;
+  will-change: transform;
+}
+
+/* ---------- Feixes de luz na borda ---------- */
+.auth-beams {
+  position: absolute;
+  inset: -1px;
+  border-radius: 16px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.auth-beams .beam {
+  position: absolute;
+  opacity: 0.7;
+  animation-iteration-count: infinite, infinite;
+  animation-timing-function: ease-in-out, ease-in-out;
+  animation-duration: 3.5s, 2.4s;
+  animation-direction: normal, alternate;
+}
+
+.beam.top, .beam.bottom {
+  height: 3px;
+  width: 50%;
+  background: linear-gradient(to right, transparent, #ff6b74, transparent);
+}
+.beam.left, .beam.right {
+  width: 3px;
+  height: 50%;
+  background: linear-gradient(to bottom, transparent, #ff6b74, transparent);
+}
+
+.beam.top    { top: 0;    left: -50%;  animation-name: beam-top,    beam-glow; }
+.beam.right  { right: 0;  top: -50%;   animation-name: beam-right,  beam-glow; animation-delay: 0.6s, 0.6s; }
+.beam.bottom { bottom: 0; right: -50%; animation-name: beam-bottom, beam-glow; animation-delay: 1.2s, 1.2s; }
+.beam.left   { left: 0;   bottom: -50%; animation-name: beam-left,  beam-glow; animation-delay: 1.8s, 1.8s; }
+
+@keyframes beam-top    { 0% { left: -50%; }   70%, 100% { left: 100%; } }
+@keyframes beam-right  { 0% { top: -50%; }    70%, 100% { top: 100%; } }
+@keyframes beam-bottom { 0% { right: -50%; }  70%, 100% { right: 100%; } }
+@keyframes beam-left   { 0% { bottom: -50%; } 70%, 100% { bottom: 100%; } }
+@keyframes beam-glow {
+  from { opacity: 0.3; filter: blur(1px); }
+  to   { opacity: 0.8; filter: blur(2.5px); }
+}
+
+.auth-beams .dot {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  filter: blur(1.5px);
+  animation: auth-dot 2.3s ease-in-out infinite alternate;
+}
+.dot.tl { top: 0;    left: 0;  width: 5px; height: 5px; }
+.dot.tr { top: 0;    right: 0; width: 8px; height: 8px; animation-delay: 0.5s; }
+.dot.br { bottom: 0; right: 0; width: 8px; height: 8px; animation-delay: 1s; }
+.dot.bl { bottom: 0; left: 0;  width: 5px; height: 5px; animation-delay: 1.5s; }
+@keyframes auth-dot { from { opacity: 0.2; } to { opacity: 0.45; } }
+
+/* Brilho extra ao passar o mouse */
+.auth-hover-glow {
+  position: absolute;
+  inset: -1px;
+  border-radius: 16px;
+  opacity: 0;
+  background: linear-gradient(to right, rgba(255,255,255,0.04), rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+  box-shadow: 0 0 40px rgba(227, 6, 19, 0.25);
+  transition: opacity 0.5s;
+  pointer-events: none;
+}
+.auth-stage:hover .auth-hover-glow { opacity: 0.8; }
+
+/* ---------- Card de vidro ---------- */
+.auth-card {
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  pointer-events: none;
+  background-image:
+    linear-gradient(135deg, #fff 0.5px, transparent 0.5px),
+    linear-gradient(45deg, #fff 0.5px, transparent 0.5px);
+  background-size: 30px 30px;
+}
+
+.auth-card > * { position: relative; }
+
+/* Cabeçalho */
+.auth-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.auth-logo {
+  position: relative;
+  overflow: hidden;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Anton', sans-serif;
+  font-size: 20px;
+  color: #fff;
+  animation: auth-pop 0.8s var(--ease-spring) both;
+}
+.auth-logo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+}
+@keyframes auth-pop {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.auth-card .logo {
+  font-size: 30px;
+  margin-bottom: 4px;
+  background: linear-gradient(to bottom, #fff, rgba(255,255,255,0.75));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.auth-sub {
+  font-size: 11px;
+  letter-spacing: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Abas */
+.auth-card .abas { margin-bottom: 16px; gap: 8px; }
+.auth-card .aba {
+  padding: 9px;
+  font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.auth-card .aba.ativa {
+  background: #e30613;
+  border-color: #e30613;
+  box-shadow: 0 0 18px rgba(227, 6, 19, 0.45);
+}
+
+/* Campos */
+.auth-card .campo {
+  position: relative;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  transition: transform 0.25s var(--ease-out);
+}
+.auth-card .campo:hover { transform: scale(1.01); }
+
+.auth-card .campo .icone {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+  transition: color 0.3s;
+}
+.auth-card .campo:focus-within .icone { color: #fff; }
+
+.auth-card input {
+  height: 40px;
+  margin-bottom: 0;
+  padding: 0 40px;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: background 0.3s, border-color 0.3s;
+}
+.auth-card input::placeholder { color: rgba(255, 255, 255, 0.3); }
+.auth-card input:focus {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 90, 100, 0.55);
+}
+
+.auth-card .ver-senha {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  width: 32px;
+  height: 32px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #000;
+  cursor: pointer;
+  transition: color 0.3s;
+  overflow: visible;
+}
+.auth-card .ver-senha:hover { color: #fff; }
+
+/* Esconde o olhinho nativo do Edge/Chrome pra não aparecer duplicado */
+.auth-card input::-ms-reveal,
+.auth-card input::-ms-clear { display: none; }
+.auth-card input::-webkit-credentials-auto-fill-button { display: none !important; }
+.auth-card .ver-senha svg { width: 16px; height: 16px; }
+.auth-card .ver-senha .olho-aberto { display: none; }
+.auth-card .ver-senha.visivel .olho-aberto { display: block; }
+.auth-card .ver-senha.visivel .olho-fechado { display: none; }
+
+/* Botão principal */
+.auth-card #btn-acao {
+  position: relative;
+  overflow: hidden;
+  height: 44px;
+  padding: 0;
+  margin-top: 8px;
+  font-size: 18px;
+  letter-spacing: 2px;
+  border-radius: 10px;
+  background: linear-gradient(to bottom, #ff1a2b, #e30613);
+  box-shadow: 0 6px 20px rgba(227, 6, 19, 0.35);
+}
+.auth-card #btn-acao:hover:not(:disabled) {
+  background: linear-gradient(to bottom, #ff3342, #ff0a1c);
+  box-shadow: 0 10px 30px rgba(227, 6, 19, 0.55);
+}
+.auth-card #btn-acao::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+.auth-card #btn-acao.carregando::before {
+  opacity: 1;
+  animation: auth-brilho 1.5s ease-in-out infinite;
+}
+@keyframes auth-brilho {
+  to { transform: translateX(100%); }
+}
+
+.auth-card .msg { margin-top: 14px; }
+
+/* Toque / sem mouse: sem inclinação */
+@media (hover: none) {
+  .auth-tilt { transform: none !important; }
+}
+
+@media (max-width: 480px) {
+  .auth-card { padding: 20px; }
+}
+
+
+/* ==================== TEMA VERMELHO/PRETO NO APP TODO ==================== */
+/* Mesmo fundo e vidro da tela de login, aplicado em todas as abas do app */
+
+body { background: #000; }
+
+.tela-app {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Fundo fixo: degradê vermelho -> preto + brilhos */
+.tela-app::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 0%, rgba(255, 40, 55, 0.28), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(255, 40, 55, 0.22), transparent 70%),
+    linear-gradient(to bottom, rgba(227, 6, 19, 0.40), rgba(130, 0, 10, 0.50) 50%, #000);
+}
+
+/* Brilho que pulsa devagar no topo */
+.tela-app::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 50%;
+  width: 100vw;
+  max-width: 900px;
+  height: 50vh;
+  transform: translateX(-50%);
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 90, 100, 0.22), transparent 70%);
+  animation: app-glow 8s ease-in-out infinite alternate;
+}
+@keyframes app-glow {
+  from { opacity: 0.4; }
+  to   { opacity: 1; }
+}
+
+/* Cabeçalho de vidro */
+.app-header {
+  background: rgba(0, 0, 0, 0.45);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 30px rgba(227, 6, 19, 0.15);
+}
+.menu-mobile { border-top-color: rgba(255, 255, 255, 0.08); }
+
+.dropdown-peso {
+  background: rgba(0, 0, 0, 0.75);
+  border-color: rgba(255, 255, 255, 0.10);
+  border-top-color: #e30613;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+/* Cartões e listas: preto translúcido (sem blur pra não pesar em listas longas) */
+.resumo-ontem,
+.lista-semana li,
+.card-exercicio,
+.grafico-box,
+.perfil-lista li {
+  background: rgba(0, 0, 0, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.card-exercicio:hover {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 14px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* Destaques: vidro com blur (poucos itens) */
+.pergunta-ontem,
+.perfil-destaque {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.35));
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.perfil-card {
+  background: rgba(0, 0, 0, 0.40);
+  border-color: rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.perfil-destaque { border-color: rgba(255, 255, 255, 0.08); border-left-color: #e30613; }
+.perfil-lista li { border-color: rgba(255, 255, 255, 0.08); border-left-color: #e30613; }
+
+/* Campos dentro do app */
+.tela-app input {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.tela-app input:focus { border-color: #e30613; background: rgba(255, 255, 255, 0.09); }
+
+.select-mes {
+  background: rgba(0, 0, 0, 0.45);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.select-mes option { background: #111; }
+
+.filtro-btn { border-color: rgba(255, 255, 255, 0.20); }
+
+.grafico-scroll::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.4); }
