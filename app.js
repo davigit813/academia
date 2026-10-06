@@ -335,6 +335,10 @@ async function trocarAba(nome) {
     await carregarPerfil();
   }
 
+  // Botão "desfazer" (↩) só existe na aba Treino, e só depois de responder o check-in de ontem
+  const jaRespondeu = document.getElementById("pergunta-ontem").classList.contains("escondido");
+  btnSeta.classList.toggle("escondido", nome !== "treino" || !jaRespondeu);
+
   document.getElementById("menu-mobile").classList.add("escondido");
   document.getElementById("dropdown-peso").classList.remove("aberto");
   document.getElementById("submenu-peso-mob").classList.remove("aberto");
