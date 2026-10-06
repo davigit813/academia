@@ -1,6 +1,6 @@
 // Versão do cache. Você NÃO precisa mexer aqui à mão:
 // rode `python atualizar_versao.py` antes de publicar (ele troca este número e o ?v= do index.html juntos).
-const CACHE = "academia-v16";
+const CACHE = "academia-v17";
 
 // Tudo é relativo à pasta onde este arquivo está (funciona na raiz do site ou numa subpasta)
 const BASE = self.registration.scope;
@@ -14,8 +14,8 @@ const ARQUIVOS = [
   "manifest.json",
   "logo.png",
   "logosite.png",
-  "icones/icon-192.png",
-  "icones/icon-512.png"
+  "icones/icon-192-v2.png",
+  "icones/icon-512-v2.png"
 ].map(aqui);
 
 const CAMINHOS = ARQUIVOS.map((u) => new URL(u).pathname);
