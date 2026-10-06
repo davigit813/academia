@@ -1,0 +1,12 @@
+# Segredos: NUNCA suba isto pro GitHub
+.env
+.env.*
+*.pem
+*.key
+supabase/.temp/
+
+# Lixo do sistema / editor
+.DS_Store
+Thumbs.db
+*.log
+node_modules/

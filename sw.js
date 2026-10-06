@@ -1,28 +1,36 @@
-// Troque este número a cada vez que publicar uma mudança (v10 -> v11 -> v12...)
-const CACHE = "academia-v13";
+// Versão do cache. Você NÃO precisa mexer aqui à mão:
+// rode `python atualizar_versao.py` antes de publicar (ele troca este número e o ?v= do index.html juntos).
+const CACHE = "academia-v15";
+
+// Tudo é relativo à pasta onde este arquivo está (funciona na raiz do site ou numa subpasta)
+const BASE = self.registration.scope;
+const aqui = (caminho) => new URL(caminho, BASE).href;
 
 const ARQUIVOS = [
-  "/",
-  "/index.html",
-  "/style.css",
-  "/app.js",
-  "/manifest.json",
-  "/logo.png",
-  "/logosite.png",
-  "/icones/icon-192.png"
-];
+  "./",
+  "index.html",
+  "style.css",
+  "app.js",
+  "manifest.json",
+  "logo.png",
+  "logosite.png",
+  "icones/icon-192.png",
+  "icones/icon-512.png"
+].map(aqui);
 
-// Instala e já guarda os arquivos principais
+const CAMINHOS = ARQUIVOS.map((u) => new URL(u).pathname);
+const CAMINHO_INDICE = new URL("exercicios/indice.json", BASE).pathname;
+
+// Instala e já guarda os arquivos principais.
+// Um por um: se algum faltar (ex.: um ícone), os outros continuam salvos.
 self.addEventListener("install", (e) => {
   e.waitUntil(
-    caches.open(CACHE)
-      .then((c) => c.addAll(ARQUIVOS))
-      .catch(() => {})
+    caches.open(CACHE).then((c) => Promise.allSettled(ARQUIVOS.map((u) => c.add(u))))
   );
   self.skipWaiting();
 });
 
-// Apaga caches antigos (academia-v9 etc.) e assume o controle
+// Apaga caches antigos e assume o controle
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys()
@@ -38,6 +46,7 @@ self.addEventListener("message", (e) => {
 
 // Sempre tenta a internet primeiro (pega a versão nova);
 // só usa o cache se estiver sem conexão.
+// O índice de exercícios também é guardado, pra aba Exercícios abrir offline.
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
@@ -48,14 +57,17 @@ self.addEventListener("fetch", (e) => {
   e.respondWith(
     fetch(req, { cache: "no-cache" })
       .then((res) => {
-        if (res.ok && ARQUIVOS.includes(url.pathname)) {
+        if (res.ok && (CAMINHOS.includes(url.pathname) || url.pathname === CAMINHO_INDICE)) {
           const copia = res.clone();
           caches.open(CACHE).then((c) => c.put(req, copia));
         }
         return res;
       })
       .catch(() =>
-        caches.match(req, { ignoreSearch: true }).then((r) => r || caches.match("/index.html"))
+        caches.match(req, { ignoreSearch: true }).then((r) => {
+          if (r) return r;
+          return req.mode === "navigate" ? caches.match(aqui("index.html")) : Response.error();
+        })
       )
   );
 });

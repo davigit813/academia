@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#14160f">
   <title>academia☯️</title>
   <link rel="icon" type="image/png" href="logosite.png">
+  <link rel="apple-touch-icon" href="icones/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=15">
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
@@ -58,17 +60,17 @@
           <form id="form">
             <div class="campo" id="campo-nome">
               <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <input type="text" id="nome" placeholder="SEU NOME">
+              <input type="text" id="nome" placeholder="SEU NOME" aria-label="Seu nome" autocomplete="name" maxlength="60">
             </div>
 
             <div class="campo">
               <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
-              <input type="email" id="email" placeholder="SEU EMAIL" required>
+              <input type="email" id="email" placeholder="SEU EMAIL" aria-label="Seu email" autocomplete="email" required>
             </div>
 
             <div class="campo">
               <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <input type="password" id="senha" placeholder="SUA SENHA" required minlength="6">
+              <input type="password" id="senha" placeholder="SUA SENHA" aria-label="Sua senha" autocomplete="current-password" required minlength="6">
               <button type="button" id="ver-senha" class="ver-senha" aria-label="Mostrar senha">
                 <svg class="olho-fechado" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
                 <svg class="olho-aberto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -90,7 +92,7 @@
     <header class="app-header">
       <div class="header-conteudo">
         <div class="header-esquerda">
-          <button id="btn-seta" class="btn-seta escondido" title="Desfazer">↩</button>
+          <button id="btn-seta" class="btn-seta escondido" type="button" title="Desfazer" aria-label="Desfazer a resposta de ontem">↩</button>
           <img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
         </div>
 
@@ -101,12 +103,13 @@
             <span id="peso-ghost" class="menu-item com-seta peso-ghost" aria-hidden="true"><span>MEU PESO</span><svg class="seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
 
             <div id="dropdown-peso" class="peso-morph">
-              <button id="menu-peso" class="menu-item com-seta" type="button"><span>MEU PESO</span><svg class="seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+              <button id="menu-peso" class="menu-item com-seta" type="button" aria-haspopup="true" aria-expanded="false"><span>MEU PESO</span><svg class="seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
               <div class="peso-painel">
                 <div class="peso-lista">
                   <div class="peso-inner">
                     <button id="btn-add-peso" class="peso-item" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg><span>ADICIONAR PESO</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
                     <button id="btn-historico" class="peso-item" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg><span>HISTÓRICO</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+                    <button id="btn-grafico" class="peso-item" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg><span>GRÁFICO</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
                   </div>
                 </div>
               </div>
@@ -132,15 +135,16 @@
         <input type="file" id="input-avatar" accept="image/*" hidden>
 
         <button id="btn-sair" class="btn-sair-topo">SAIR</button>
-        <button id="btn-hamburguer" class="btn-hamburguer">☰</button>
+        <button id="btn-hamburguer" class="btn-hamburguer" type="button" aria-label="Abrir menu" aria-controls="menu-mobile" aria-expanded="false">☰</button>
       </div>
 
       <nav id="menu-mobile" class="menu-mobile escondido">
         <button id="menu-treino-mob" class="menu-item-mob">TREINO</button>
-        <button id="menu-peso-mob" class="menu-item-mob com-seta" type="button"><span>MEU PESO</span><svg class="seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <button id="menu-peso-mob" class="menu-item-mob com-seta" type="button" aria-expanded="false"><span>MEU PESO</span><svg class="seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
         <div id="submenu-peso-mob" class="submenu-mob">
           <button id="btn-add-peso-mob" class="peso-item" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg><span>ADICIONAR PESO</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
           <button id="btn-historico-mob" class="peso-item" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg><span>HISTÓRICO</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+                    <button id="btn-grafico-mob" class="peso-item" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg><span>GRÁFICO</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
         </div>
         <button id="menu-exercicios-mob" class="menu-item-mob">EXERCÍCIOS</button>
         <button id="menu-progresso-mob" class="menu-item-mob">PROGRESSO</button>
@@ -185,7 +189,7 @@
       <section id="aba-add-peso" class="aba-conteudo escondido">
         <h2 class="titulo-secao">ADICIONAR PESO</h2>
         <div class="peso-input-box">
-          <input type="number" id="input-peso" placeholder="EX: 78.5" step="0.1" min="0" max="200">
+          <input type="number" id="input-peso" placeholder="EX: 78.5" step="0.1" min="0" max="200" inputmode="decimal" aria-label="Seu peso em kg">
           <button id="btn-salvar-peso">SALVAR</button>
         </div>
         <p id="msg-peso" class="msg"></p>
@@ -198,6 +202,35 @@
         <p id="sem-historico" class="sem-dados escondido">NENHUM REGISTRO AINDA.</p>
       </section>
 
+      <!-- ABA: GRÁFICO DE PESO -->
+      <section id="aba-grafico" class="aba-conteudo escondido">
+        <h2 class="titulo-secao">GRÁFICO DE PESO</h2>
+
+        <div class="pg-card">
+          <div class="pg-header">
+            <h3 class="pg-titulo">EVOLUÇÃO DO PESO</h3>
+            <p class="pg-desc" id="pg-desc">—</p>
+          </div>
+
+          <div class="pg-filtros" role="group" aria-label="Período do gráfico">
+            <button type="button" class="pg-filtro" data-dias="30" aria-pressed="false">30 DIAS</button>
+            <button type="button" class="pg-filtro" data-dias="90" aria-pressed="false">90 DIAS</button>
+            <button type="button" class="pg-filtro ativo" data-dias="0" aria-pressed="true">TUDO</button>
+          </div>
+
+          <div class="pg-corpo" id="pg-corpo">
+            <svg id="pg-svg" class="pg-svg" role="img" tabindex="0" aria-label="Gráfico de linha do peso"></svg>
+            <div id="pg-tooltip" class="pg-tooltip" aria-live="polite"></div>
+          </div>
+          <p id="pg-vazio" class="sem-dados escondido">NENHUM REGISTRO AINDA.</p>
+
+          <div class="pg-rodape">
+            <p class="pg-tendencia neutra" id="pg-tendencia"></p>
+            <p class="pg-nota" id="pg-nota"></p>
+          </div>
+        </div>
+      </section>
+
       <!-- ABA: PROGRESSO -->
       <section id="aba-progresso" class="aba-conteudo escondido">
         <h2 class="titulo-secao">PROGRESSO</h2>
@@ -207,8 +240,8 @@
 
         <div id="form-progresso" class="form-progresso escondido">
           <div class="progresso-input-box">
-            <input type="text" id="input-nome-exercicio" placeholder="NOME DO EXERCÍCIO">
-            <input type="number" id="input-carga" placeholder="KG" step="0.5" min="0" max="1000">
+            <input type="text" id="input-nome-exercicio" placeholder="NOME DO EXERCÍCIO" aria-label="Nome do exercício" maxlength="80">
+            <input type="number" id="input-carga" placeholder="KG" step="0.5" min="0" max="1000" inputmode="decimal" aria-label="Carga em kg">
           </div>
           <button id="btn-salvar-carga">SALVAR CARGA</button>
           <p id="msg-progresso" class="msg"></p>
@@ -268,13 +301,13 @@
         <!-- Grid de estatísticas -->
         <div class="perfil-grid">
           <div class="perfil-card destaque-ambar">
-            <span class="card-icone">🏆</span>
+            <span class="card-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></span>
             <span class="card-label">MELHOR STREAK</span>
             <span class="card-valor" id="perfil-melhor-streak">—</span>
           </div>
 
           <div class="perfil-card">
-            <span class="card-icone">🏋️</span>
+            <span class="card-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11"/><path d="M17.5 6.5v11"/><path d="M3.5 9v6"/><path d="M20.5 9v6"/><path d="M6.5 12h11"/></svg></span>
             <span class="card-label">TREINOS TOTAIS</span>
             <span class="card-valor" id="perfil-treinos">—</span>
           </div>
@@ -283,19 +316,19 @@
         <!-- Grid inferior -->
         <div class="perfil-grid">
           <div class="perfil-card">
-            <span class="card-icone">📅</span>
+            <span class="card-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span>
             <span class="card-label">MEMBRO DESDE</span>
             <span class="card-valor" id="perfil-membro">—</span>
           </div>
 
           <div class="perfil-card destaque-ambar">
-            <span class="card-icone">⚖️</span>
+            <span class="card-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg></span>
             <span class="card-label">PESO ATUAL</span>
             <span class="card-valor" id="perfil-peso">—</span>
           </div>
 
           <div class="perfil-card" style="grid-column: 1 / -1;">
-            <span class="card-icone">📉</span>
+            <span class="card-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg></span>
             <span class="card-label">DIFERENÇA DESDE O INÍCIO</span>
             <span class="card-valor" id="perfil-diferenca">—</span>
           </div>
@@ -315,7 +348,7 @@
   </div>
 
     <!-- AVISO DE ATUALIZAÇÃO (PWA) -->
-  <div id="update-banner" class="update-banner">
+  <div id="update-banner" class="update-banner" role="status" aria-live="polite">
     <span class="update-texto">
       <strong>Nova versão disponível!</strong> Toque pra atualizar.
     </span>
@@ -325,7 +358,7 @@
 <script>
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-      navigator.serviceWorker.register("/sw.js")
+      navigator.serviceWorker.register("sw.js")
         .then((reg) => {
           console.log("Service Worker registrado:", reg);
 
@@ -408,6 +441,6 @@
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-  <script src="app.js?v=11" defer></script>
+  <script src="app.js?v=15" defer></script>
 </body>
 </html>
