@@ -374,7 +374,7 @@ input:focus { outline: none; border-color: #e30613; }
 }
 
 .header-conteudo {
-  max-width: 960px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 14px 20px;
   display: flex;
@@ -1454,7 +1454,7 @@ input:focus { outline: none; border-color: #e30613; }
 }
 
 /* ==================== RESPONSIVO ==================== */
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
   .header-menu { display: none; }
   .btn-sair-topo { display: none; }
   .btn-hamburguer { display: flex; align-items: center; justify-content: center; margin-left: auto; }
@@ -2249,13 +2249,13 @@ body { background: #000; }
 .avatar-lapis svg { width: 9px; height: 9px; }
 
 /* Telas médias: aperta um pouco o menu pra caber o avatar */
-@media (min-width: 961px) and (max-width: 1160px) {
+@media (min-width: 1101px) and (max-width: 1160px) {
   .header-conteudo { gap: 12px; }
   .menu-item { padding: 10px 11px; letter-spacing: 1px; }
 }
 
 /* Celular: avatar fica à esquerda do hambúrguer */
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
   .avatar-wrap { margin-left: auto; }
   .btn-hamburguer { margin-left: 0; }
 }
@@ -2341,7 +2341,7 @@ button.avatar-lapis:hover { background: #ff0a1c; transform: scale(1.15); }
   transform: none;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
   .perfil-topo-texto .perfil-nome { font-size: 26px; }
 }
 @media (max-width: 480px) {
@@ -2742,7 +2742,7 @@ input:focus-visible,
 
 /* ==================== LOGIN LEVE NO CELULAR ==================== */
 /* Menos brilhos e desfoques pesados em telas pequenas / sem mouse */
-@media (max-width: 960px), (hover: none) {
+@media (max-width: 1100px), (hover: none) {
   .auth-bg-noise,
   .auth-spot { display: none; }
   .auth-glow-top { filter: blur(40px); }
@@ -2753,3 +2753,309 @@ input:focus-visible,
 
 /* Dropdown "Meu peso": um pouco mais largo pra caber "ADICIONAR PESO" numa linha só */
 .peso-morph.aberto { width: 236px; }
+
+
+/* ============================================================
+   TEMA CLARO / ESCURO — BOTÃO (pílula com sol e lua)
+   ============================================================ */
+.tema-toggle {
+  position: relative;
+  flex-shrink: 0;
+  width: 64px;
+  height: 32px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 999px;
+  border: 1px solid #27272a;
+  background: #09090b;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.tema-toggle .ripple-effect { display: none; }
+
+.tema-toggle svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.tema-bolinha,
+.tema-fantasma {
+  position: absolute;
+  top: 3px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.tema-bolinha {
+  left: 3px;
+  background: #27272a;
+  transition: transform 0.3s ease, background-color 0.3s;
+}
+
+.tema-fantasma { right: 3px; }
+
+/* escuro: bolinha com lua, sol apagado do outro lado */
+.tema-bolinha .ico-lua { color: #fff; }
+.tema-bolinha .ico-sol { display: none; }
+.tema-fantasma .ico-sol { color: #6b7280; }
+.tema-fantasma .ico-lua { display: none; }
+
+/* claro: a bolinha desliza pro outro lado e vira sol */
+html[data-tema="claro"] .tema-toggle { background: #fff; border-color: #e4e4e7; }
+html[data-tema="claro"] .tema-bolinha { transform: translateX(32px); background: #e5e7eb; }
+html[data-tema="claro"] .tema-bolinha .ico-lua { display: none; }
+html[data-tema="claro"] .tema-bolinha .ico-sol { display: block; color: #374151; }
+html[data-tema="claro"] .tema-fantasma { right: auto; left: 3px; }
+html[data-tema="claro"] .tema-fantasma .ico-sol { display: none; }
+html[data-tema="claro"] .tema-fantasma .ico-lua { display: block; color: #000; }
+
+/* na tela de login o botão fica no canto de cima */
+.tema-toggle-auth {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 5;
+}
+
+
+/* ============================================================
+   COR DA DIFERENÇA DE PESO (PERFIL) — vale nos dois temas
+   ============================================================ */
+#perfil-diferenca[data-tendencia="neutra"] { color: #888; }
+#perfil-diferenca[data-tendencia="baixou"] { color: #4ade80; }
+#perfil-diferenca[data-tendencia="subiu"]  { color: #ff4b36; }
+
+
+/* ============================================================
+   TEMA CLARO — o vermelho da marca continua, mudam fundos e textos
+   Paleta: fundo #f6f4f3 · cards brancos · texto #14160f · cinza #6b6b6b
+   ============================================================ */
+html[data-tema="claro"] {
+  color-scheme: light;
+  --ink: #14160f;
+  --line: #d9d4d3;
+  --surface-2: #ffffff;
+}
+
+html[data-tema="claro"] body { background: #f6f4f3; color: #14160f; }
+
+html[data-tema="claro"] button:focus-visible,
+html[data-tema="claro"] a:focus-visible,
+html[data-tema="claro"] .pg-svg:focus-visible { outline-color: #14160f; }
+
+/* ---------- aviso de atualização ---------- */
+html[data-tema="claro"] .update-banner { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15); }
+html[data-tema="claro"] .update-banner .update-btn { color: #fff; }
+
+/* ---------- fundo do app ---------- */
+html[data-tema="claro"] .tela-app::before {
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 0%, rgba(227, 6, 19, 0.16), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(227, 6, 19, 0.10), transparent 70%),
+    linear-gradient(to bottom, rgba(227, 6, 19, 0.12), rgba(227, 6, 19, 0.04) 50%, #f6f4f3);
+}
+html[data-tema="claro"] .tela-app::after { background: radial-gradient(ellipse at 50% 0%, rgba(227, 6, 19, 0.10), transparent 70%); }
+
+/* ---------- cabeçalho e menus ---------- */
+html[data-tema="claro"] .app-header { background: rgba(255, 255, 255, 0.78); box-shadow: 0 8px 30px rgba(227, 6, 19, 0.10); }
+html[data-tema="claro"] .header-logo { filter: invert(1); }
+html[data-tema="claro"] .btn-seta { border-color: rgba(0, 0, 0, 0.25); color: #14160f; }
+html[data-tema="claro"] .btn-seta:hover { border-color: #e30613; color: #e30613; background: rgba(227, 6, 19, 0.08); }
+
+html[data-tema="claro"] .menu-item { color: #6b6b6b; }
+html[data-tema="claro"] .menu-item:hover { color: #14160f; background: rgba(0, 0, 0, 0.05); }
+html[data-tema="claro"] .menu-item.ativo { color: #fff; background: #e30613; }
+html[data-tema="claro"] .menu-item.peso-aberto { color: #14160f; background: rgba(227, 6, 19, 0.12); }
+html[data-tema="claro"] .peso-morph.peso-ativo:not(.aberto) #menu-peso { color: #fff; }
+
+html[data-tema="claro"] .peso-morph.aberto {
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.10),
+    0 20px 50px rgba(0, 0, 0, 0.18),
+    0 0 30px rgba(227, 6, 19, 0.10);
+}
+html[data-tema="claro"] .peso-morph.aberto #menu-peso { color: #14160f; }
+html[data-tema="claro"] .peso-morph.aberto .peso-painel { border-top-color: rgba(0, 0, 0, 0.08); }
+html[data-tema="claro"] .peso-item { color: #444; }
+html[data-tema="claro"] .peso-item .check { color: #e30613; }
+html[data-tema="claro"] .peso-item:hover { background: rgba(0, 0, 0, 0.05); color: #14160f; }
+html[data-tema="claro"] .peso-item.ativo,
+html[data-tema="claro"] .peso-item.ativo:hover { color: #14160f; background: rgba(227, 6, 19, 0.12); box-shadow: inset 0 0 0 1px rgba(227, 6, 19, 0.35); }
+html[data-tema="claro"] .submenu-mob .peso-item { background: rgba(0, 0, 0, 0.04); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06); }
+html[data-tema="claro"] .submenu-mob .peso-item.ativo,
+html[data-tema="claro"] .submenu-mob .peso-item.ativo:hover { background: rgba(227, 6, 19, 0.12); box-shadow: inset 0 0 0 1px rgba(227, 6, 19, 0.35); }
+
+html[data-tema="claro"] .btn-sair-topo { border-color: #14160f; color: #14160f; }
+html[data-tema="claro"] .btn-sair-topo:hover { background: #14160f; color: #fff; }
+html[data-tema="claro"] .btn-hamburguer { border-color: rgba(0, 0, 0, 0.2); color: #14160f; }
+html[data-tema="claro"] .btn-hamburguer:hover { border-color: #e30613; color: #e30613; }
+html[data-tema="claro"] .menu-mobile { border-top-color: rgba(0, 0, 0, 0.08); }
+html[data-tema="claro"] .menu-item-mob { color: #555; }
+html[data-tema="claro"] .menu-item-mob:hover { background: rgba(0, 0, 0, 0.05); color: #14160f; }
+html[data-tema="claro"] .menu-item-mob.ativo { background: #e30613; color: #fff; }
+html[data-tema="claro"] .menu-item-mob.aberto { color: #14160f; }
+html[data-tema="claro"] .menu-item-mob.peso-aberto { color: #14160f; background: rgba(227, 6, 19, 0.10); }
+html[data-tema="claro"] .menu-item-mob.sair { color: #e30613; border-top-color: rgba(0, 0, 0, 0.08); }
+
+/* ---------- foto de perfil ---------- */
+html[data-tema="claro"] .avatar-circulo {
+  color: #8a8a8a;
+  background: linear-gradient(145deg, #ececec, #cfcfcf);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+html[data-tema="claro"] .btn-avatar:hover .avatar-circulo { border-color: rgba(0, 0, 0, 0.4); }
+html[data-tema="claro"] .avatar-lapis { border-color: #f6f4f3; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); }
+html[data-tema="claro"] .perfil-foto {
+  color: #8a8a8a;
+  background: linear-gradient(145deg, #ececec, #cfcfcf);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 0 0 4px rgba(227, 6, 19, 0.30), 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+html[data-tema="claro"] .perfil-foto:hover { box-shadow: 0 0 0 4px rgba(227, 6, 19, 0.55), 0 14px 36px rgba(0, 0, 0, 0.2); }
+
+/* ---------- textos gerais ---------- */
+html[data-tema="claro"] .saudacao,
+html[data-tema="claro"] .titulo-secao,
+html[data-tema="claro"] .perfil-nome { color: #14160f; }
+html[data-tema="claro"] .dia-hoje,
+html[data-tema="claro"] .subtitulo-secao { color: #6b6b6b; }
+html[data-tema="claro"] .perfil-topo-texto .titulo-secao { color: rgba(20, 22, 15, 0.75); }
+html[data-tema="claro"] .streak-badge .streak-label { color: #6b6b6b; }
+html[data-tema="claro"] .sem-dados,
+html[data-tema="claro"] .exercicios-loading { color: #8a8a8a; }
+html[data-tema="claro"] .exercicios-loading::after { border-color: rgba(0, 0, 0, 0.12); border-top-color: #e30613; }
+html[data-tema="claro"] .msg.erro { color: #d1140a; }
+html[data-tema="claro"] .msg.sucesso { color: #15803d; }
+
+/* ---------- cards e listas ---------- */
+html[data-tema="claro"] .resumo-ontem,
+html[data-tema="claro"] .lista-semana li,
+html[data-tema="claro"] .card-exercicio,
+html[data-tema="claro"] .grafico-box,
+html[data-tema="claro"] .perfil-lista li {
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.07), 0 6px 18px rgba(0, 0, 0, 0.04);
+}
+html[data-tema="claro"] .card-exercicio:hover { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.07), 0 14px 30px rgba(0, 0, 0, 0.12); }
+html[data-tema="claro"] .resumo-ontem { color: #3a3a3a; }
+
+html[data-tema="claro"] .pergunta-ontem,
+html[data-tema="claro"] .perfil-destaque {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
+}
+html[data-tema="claro"] .pergunta-ontem p { color: #14160f; }
+
+html[data-tema="claro"] .lista-semana li:not(.hoje):not(.linha-historico) { border-left-color: rgba(0, 0, 0, 0.18); }
+html[data-tema="claro"] .lista-semana li .dia-nome { color: #6b6b6b; }
+html[data-tema="claro"] .lista-semana li .dia-treino { color: #14160f; }
+html[data-tema="claro"] .lista-semana li.hoje { background: #e30613; border-left-color: #fff; box-shadow: 0 8px 22px rgba(227, 6, 19, 0.25); }
+html[data-tema="claro"] .lista-semana li.hoje .dia-nome { color: rgba(255, 255, 255, 0.88); }
+html[data-tema="claro"] .lista-semana li.hoje .dia-treino { color: #fff; }
+html[data-tema="claro"] .lista-semana li.linha-historico { color: #555; }
+
+html[data-tema="claro"] .card-exercicio .nome-exercicio { color: #14160f; }
+html[data-tema="claro"] .card-exercicio .equip-exercicio { color: #6b6b6b; }
+
+html[data-tema="claro"] .linha-progresso .nome-prog { color: #14160f; }
+html[data-tema="claro"] .linha-progresso .data-prog { color: #777; }
+
+html[data-tema="claro"] .btn-acao-linha { border-color: rgba(0, 0, 0, 0.18); color: #666; }
+html[data-tema="claro"] .btn-acao-linha.editar:hover { color: #14160f; border-color: #14160f; }
+html[data-tema="claro"] .btn-acao-linha.apagar:hover { color: #d1140a; border-color: #d1140a; background: rgba(227, 6, 19, 0.08); }
+
+/* ---------- perfil ---------- */
+html[data-tema="claro"] .perfil-destaque { border-color: rgba(0, 0, 0, 0.08); border-left-color: #e30613; }
+html[data-tema="claro"] .perfil-destaque .destaque-label { color: #6b6b6b; }
+html[data-tema="claro"] .perfil-destaque .destaque-nome { color: #14160f; }
+html[data-tema="claro"] .perfil-destaque .destaque-valor { text-shadow: none; }
+html[data-tema="claro"] .perfil-card {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+}
+html[data-tema="claro"] .perfil-card .card-label { color: #6b6b6b; }
+html[data-tema="claro"] .perfil-card .card-valor { color: #14160f; }
+html[data-tema="claro"] .perfil-card.destaque-ambar .card-valor { color: #b45309; }
+html[data-tema="claro"] .perfil-card.destaque-ambar .card-icone { color: #b45309; }
+html[data-tema="claro"] .perfil-lista li { border-color: rgba(0, 0, 0, 0.08); border-left-color: #e30613; }
+html[data-tema="claro"] .perfil-lista .lista-label { color: #6b6b6b; }
+html[data-tema="claro"] .perfil-lista .lista-valor { color: #14160f; }
+html[data-tema="claro"] #perfil-diferenca[data-tendencia="neutra"] { color: #6b6b6b; }
+html[data-tema="claro"] #perfil-diferenca[data-tendencia="baixou"] { color: #15803d; }
+html[data-tema="claro"] #perfil-diferenca[data-tendencia="subiu"]  { color: #d1140a; }
+
+/* ---------- campos e filtros ---------- */
+html[data-tema="claro"] input { color: #14160f; }
+html[data-tema="claro"] input::placeholder { color: #999; }
+html[data-tema="claro"] .tela-app input { background: rgba(0, 0, 0, 0.04); border-color: rgba(0, 0, 0, 0.14); }
+html[data-tema="claro"] .tela-app input:focus { border-color: #e30613; background: rgba(0, 0, 0, 0.02); }
+html[data-tema="claro"] .select-mes { background: rgba(255, 255, 255, 0.85); border-color: rgba(0, 0, 0, 0.18); color: #555; }
+html[data-tema="claro"] .select-mes:focus { border-color: #e30613; color: #14160f; }
+html[data-tema="claro"] .select-mes option { background: #fff; color: #14160f; }
+html[data-tema="claro"] .filtro-btn { border-color: rgba(0, 0, 0, 0.20); color: #6b6b6b; }
+html[data-tema="claro"] .filtro-btn:hover { color: #14160f; border-color: #14160f; }
+html[data-tema="claro"] .filtro-btn.ativo { background: #e30613; border-color: #e30613; color: #fff; }
+
+/* ---------- gráfico de peso ---------- */
+html[data-tema="claro"] .pg-card { background: rgba(255, 255, 255, 0.85); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.05); }
+html[data-tema="claro"] .pg-titulo { color: #14160f; }
+html[data-tema="claro"] .pg-desc { color: #6b6b6b; }
+html[data-tema="claro"] .pg-filtro { border-color: rgba(0, 0, 0, 0.20); color: #6b6b6b; }
+html[data-tema="claro"] .pg-filtro:hover { color: #14160f; border-color: #14160f; }
+html[data-tema="claro"] .pg-filtro.ativo { background: #e30613; border-color: #e30613; color: #fff; }
+html[data-tema="claro"] .pg-grade { stroke: rgba(0, 0, 0, 0.12); }
+html[data-tema="claro"] .pg-linha { stroke: #e30613; }
+html[data-tema="claro"] .pg-ponto { fill: #e30613; }
+html[data-tema="claro"] .pg-rotulo { fill: #14160f; stroke: rgba(255, 255, 255, 0.9); }
+html[data-tema="claro"] .pg-eixo { fill: #6b6b6b; }
+html[data-tema="claro"] .pg-halo { fill: rgba(227, 6, 19, 0.22); }
+html[data-tema="claro"] .pg-ponto-ativo { fill: #e30613; stroke: #fff; }
+html[data-tema="claro"] .pg-tooltip { background: rgba(255, 255, 255, 0.98); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12), 0 10px 30px rgba(0, 0, 0, 0.18); }
+html[data-tema="claro"] .pg-tip-data { color: #6b6b6b; }
+html[data-tema="claro"] .pg-tip-marca { background: #e30613; }
+html[data-tema="claro"] .pg-tip-rotulo { color: #6b6b6b; }
+html[data-tema="claro"] .pg-tip-valor { color: #14160f; }
+html[data-tema="claro"] .pg-tendencia.baixou { color: #15803d; }
+html[data-tema="claro"] .pg-tendencia.subiu { color: #d1140a; }
+html[data-tema="claro"] .pg-tendencia.neutra { color: #6b6b6b; }
+html[data-tema="claro"] .pg-nota { color: #888; }
+
+/* ---------- tela de login ---------- */
+html[data-tema="claro"] .tela-auth { background: #f6f4f3; }
+html[data-tema="claro"] .auth-bg-gradient { background: linear-gradient(to bottom, rgba(227, 6, 19, 0.20), rgba(227, 6, 19, 0.08) 50%, #f6f4f3); }
+html[data-tema="claro"] .auth-bg-noise { opacity: 0.05; }
+html[data-tema="claro"] .auth-glow-top { background: rgba(227, 6, 19, 0.14); }
+html[data-tema="claro"] .auth-glow-top-2 { background: rgba(255, 90, 100, 0.14); }
+html[data-tema="claro"] .auth-glow-bottom { background: rgba(227, 6, 19, 0.10); }
+html[data-tema="claro"] .auth-spot { background: rgba(227, 6, 19, 0.05); }
+html[data-tema="claro"] .auth-beams .dot { background: rgba(227, 6, 19, 0.45); }
+html[data-tema="claro"] .auth-hover-glow { background: linear-gradient(to right, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02)); box-shadow: 0 0 40px rgba(227, 6, 19, 0.15); }
+html[data-tema="claro"] .auth-card {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 25px 60px rgba(120, 0, 10, 0.18);
+}
+html[data-tema="claro"] .auth-card::before { filter: invert(1); }
+html[data-tema="claro"] .auth-logo { border-color: rgba(0, 0, 0, 0.12); color: #14160f; }
+html[data-tema="claro"] .auth-card .logo { background: linear-gradient(to bottom, #14160f, rgba(20, 22, 15, 0.7)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+html[data-tema="claro"] .auth-sub { color: rgba(20, 22, 15, 0.6); }
+html[data-tema="claro"] .aba { color: #14160f; }
+html[data-tema="claro"] .auth-card .aba { border-color: rgba(0, 0, 0, 0.28); }
+html[data-tema="claro"] .aba:hover:not(.ativa) { background: rgba(0, 0, 0, 0.05); }
+html[data-tema="claro"] .aba.ativa,
+html[data-tema="claro"] .auth-card .aba.ativa { color: #fff; background: #e30613; border-color: #e30613; }
+html[data-tema="claro"] .auth-card .campo .icone { color: rgba(0, 0, 0, 0.4); }
+html[data-tema="claro"] .auth-card .campo:focus-within .icone { color: #14160f; }
+html[data-tema="claro"] .auth-card input { color: #14160f; background: rgba(255, 255, 255, 0.85); border-color: rgba(0, 0, 0, 0.12); }
+html[data-tema="claro"] .auth-card input::placeholder { color: rgba(0, 0, 0, 0.35); }
+html[data-tema="claro"] .auth-card input:focus { background: #fff; border-color: rgba(227, 6, 19, 0.65); }
+html[data-tema="claro"] .auth-card .ver-senha { color: rgba(0, 0, 0, 0.5); }
+html[data-tema="claro"] .auth-card .ver-senha:hover { color: #14160f; }

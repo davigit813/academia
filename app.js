@@ -19,6 +19,41 @@ function escaparHtml(texto) {
   return String(texto ?? "").replace(/[&<>"']/g, c => mapa[c]);
 }
 
+// ============================================================
+// ============ TEMA CLARO / ESCURO ===========================
+// ============================================================
+// O escuro (vermelho/preto) é o padrão. O claro é ativado com data-tema="claro" no <html>.
+// A escolha fica salva neste aparelho.
+function temaAtual() {
+  return document.documentElement.getAttribute("data-tema") === "claro" ? "claro" : "escuro";
+}
+
+function aplicarTema(tema, salvar = true) {
+  const claro = tema === "claro";
+
+  if (claro) document.documentElement.setAttribute("data-tema", "claro");
+  else document.documentElement.removeAttribute("data-tema");
+
+  document.querySelectorAll(".tema-toggle").forEach(btn => {
+    btn.setAttribute("aria-checked", claro ? "true" : "false");
+  });
+
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", claro ? "#f6f4f3" : "#14160f");
+
+  if (salvar) {
+    try { localStorage.setItem("tema", tema); } catch (_) { /* navegador bloqueou: tudo bem */ }
+  }
+}
+
+document.querySelectorAll(".tema-toggle").forEach(btn => {
+  btn.addEventListener("click", () => {
+    aplicarTema(temaAtual() === "claro" ? "escuro" : "claro");
+  });
+});
+
+aplicarTema(temaAtual(), false); // sincroniza botões e barra do navegador com o tema já aplicado
+
 // ====== LOG DE EVENTOS (Discord) ======
 // Não bloqueia o fluxo do usuário. Se falhar, ignora.
 function logEvento(tipo, dados = {}) {
@@ -255,6 +290,7 @@ async function entrarNoApp(user) {
 
   telaAuth.classList.add("escondido");
   telaApp.classList.remove("escondido");
+  medirBotaoPeso(); // agora que o app está visível dá pra medir o botão "Meu peso"
 }
 
 // ====== TROCA DE ABAS ======
@@ -367,12 +403,20 @@ function medirBotaoPeso() {
   const ghost = document.getElementById("peso-ghost");
   const caixa = document.getElementById("dropdown-peso");
   if (ghost && caixa && ghost.offsetWidth) {
+    // Na primeira medição o botão já nasce com a largura certa (sem "encolher" animado)
+    const primeira = !caixa.style.getPropertyValue("--w0");
+    if (primeira) caixa.style.transition = "none";
     caixa.style.setProperty("--w0", ghost.offsetWidth + "px");
+    if (primeira) {
+      void caixa.offsetWidth;
+      caixa.style.transition = "";
+    }
   }
 }
 document.getElementById("menu-peso").addEventListener("pointerdown", medirBotaoPeso);
 document.getElementById("menu-peso").addEventListener("focus", medirBotaoPeso);
 window.addEventListener("resize", medirBotaoPeso);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(medirBotaoPeso); // refaz quando as fontes terminam de carregar
 
 // Fecha o dropdown ao clicar fora ou apertar Esc
 document.addEventListener("click", (e) => {
@@ -1203,17 +1247,21 @@ async function carregarPerfil() {
 
     if (Math.abs(diff) < 0.1) {
   el.textContent = "SEM MUDANÇA";
-  el.style.color = "#888";
+  el.style.color = "";
+  el.dataset.tendencia = "neutra";
 } else if (diff < 0) {
   el.textContent = `${diff.toFixed(1)} KG (PERDEU)`;
-  el.style.color = "#4ade80";
+  el.style.color = "";
+  el.dataset.tendencia = "baixou";
 } else {
   el.textContent = `+${diff.toFixed(1)} KG (GANHOU)`;
-  el.style.color = "#ff4b36";
+  el.style.color = "";
+  el.dataset.tendencia = "subiu";
 }
   } else {
     document.getElementById("perfil-peso").textContent = "—";
     document.getElementById("perfil-diferenca").textContent = "—";
+    document.getElementById("perfil-diferenca").removeAttribute("data-tendencia");
   }
 }
 

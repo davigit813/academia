@@ -1,6 +1,6 @@
 // Versão do cache. Você NÃO precisa mexer aqui à mão:
 // rode `python atualizar_versao.py` antes de publicar (ele troca este número e o ?v= do index.html juntos).
-const CACHE = "academia-v17";
+const CACHE = "academia-v18";
 
 // Tudo é relativo à pasta onde este arquivo está (funciona na raiz do site ou numa subpasta)
 const BASE = self.registration.scope;
